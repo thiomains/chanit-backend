@@ -36,18 +36,7 @@ async function register(req, res) {
     await usersCollection.insertOne(user);
 
     const session = await sessions.createSession(user.id, req.headers["user-agent"], req.ip);
-    const cookieContent = {
-        sessionId: session.sessionId,
-        refreshToken: session.refreshToken
-    }
-
-    res.status(201).cookie("session", cookieContent, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-        maxAge: 1000 * 60 * 60 * 24 * 7,
-        path: "/auth/session/refresh"
-    }).send("Account created");
+    sessions.setSessionCookieAndSend(res, session, 201, "Account created successfully");
 }
 
 module.exports = register;

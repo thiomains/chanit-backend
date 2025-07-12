@@ -48,8 +48,13 @@ async function refreshToken(sessionId, refreshToken) {
         return null;
     }
 
+    if (session.expiresAt < Date.now()) {
+        return null;
+    }
+
     const refreshTokenValid = await bcrypt.compare(refreshToken, session.refreshToken);
     if (!refreshTokenValid) {
+        console.log("refresh token is invalid")
         return null;
     }
 
@@ -60,8 +65,24 @@ async function refreshToken(sessionId, refreshToken) {
 
     await sessionsCollection.updateOne({sessionId: session.sessionId}, {$set: session});
 
+    session.refreshToken = refreshToken;
     session.accessToken = newAccessToken;
     return session;
 }
 
-module.exports = {createSession, refreshToken};
+function setSessionCookieAndSend(res, session, status, message) {
+    const cookieContent = {
+        sessionId: session.sessionId,
+        refreshToken: session.refreshToken
+    }
+
+    res.status(status).cookie("session", cookieContent, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+        path: "/api/auth/session/refresh"
+    }).send(message);
+}
+
+module.exports = {createSession, refreshToken, setSessionCookieAndSend};

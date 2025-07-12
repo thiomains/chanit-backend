@@ -13,6 +13,8 @@ app.get('/', (req, res) => {
 })
 
 app.post('/api/auth/register', require('./endpoints/auth/register'))
+app.post('/api/auth/login', require('./endpoints/auth/login'))
+app.post('/api/auth/session/refresh', require('./endpoints/auth/session/refresh'))
 
 app.listen(process.env.PORT, () => {
     console.log("App listening on port " + process.env.PORT);
