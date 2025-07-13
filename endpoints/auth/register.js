@@ -30,7 +30,8 @@ async function register(req, res) {
         id: snowflake.generateId(),
         username: req.body.username,
         email: req.body.email,
-        password: passwordHash
+        password: passwordHash,
+        createdAt: Date.now()
     }
 
     await usersCollection.insertOne(user);

@@ -54,7 +54,6 @@ async function refreshToken(sessionId, refreshToken) {
 
     const refreshTokenValid = await bcrypt.compare(refreshToken, session.refreshToken);
     if (!refreshTokenValid) {
-        console.log("refresh token is invalid")
         return null;
     }
 
@@ -81,8 +80,55 @@ function setSessionCookieAndSend(res, session, status, message) {
         secure: true,
         sameSite: "strict",
         maxAge: 1000 * 60 * 60 * 24 * 7,
-        path: "/api/auth/session/refresh"
+        path: "/api/auth/"
     }).send(message);
 }
 
-module.exports = {createSession, refreshToken, setSessionCookieAndSend};
+async function invalidateSessionById(sessionId) {
+    const database = await db.connectDatabase();
+    const sessionsCollection = database.collection("sessions");
+    await sessionsCollection.updateOne({sessionId: sessionId}, {$set: {active: false}});
+}
+
+async function getSession(sessionId) {
+    const database = await db.connectDatabase();
+    const sessionsCollection = database.collection("sessions");
+    return await sessionsCollection.findOne({sessionId: sessionId});
+}
+
+function isSessionValid(session) {
+    if (!session) {
+        return false;
+    }
+    if (session.active === false) {
+        return false;
+    }
+    if (session.expiresAt < Date.now()) {
+        return false;
+    }
+    return true;
+}
+
+async function isAccessTokenValid(session, accessToken) {
+    if (!isSessionValid(session)) {
+        return false;
+    }
+    if (session.accessTokenExpiresAt < Date.now()) {
+        return false;
+    }
+    return await bcrypt.compare(accessToken, session.accessToken);
+}
+
+async function validateAccess(sessionId, accessToken) {
+
+    const database = await db.connectDatabase();
+    const usersCollection = database.collection("users");
+    const session = await getSession(sessionId);
+    if (!await isAccessTokenValid(session, accessToken)) {
+        return [];
+    }
+    return await usersCollection.find({id: session.userId}).toArray();
+
+}
+
+module.exports = {createSession, refreshToken, setSessionCookieAndSend, invalidateSessionById, getSession, isSessionValid, isAccessTokenValid, validateAccess};

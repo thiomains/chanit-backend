@@ -9,7 +9,6 @@ async function refresh(req, res) {
         return;
     }
 
-    console.log(req.cookies.session)
     const session = await sessions.refreshToken(req.cookies.session.sessionId, req.cookies.session.refreshToken);
     if (!session) {
         res.status(401).send("Invalid or expired session");
@@ -24,6 +23,7 @@ async function refresh(req, res) {
     }
 
     sessions.setSessionCookieAndSend(res, session, 200, {
+        sessionId: newSession.sessionId,
         expiresAt: newSession.accessTokenExpiresAt,
         accessToken: newSession.accessToken,
     });
