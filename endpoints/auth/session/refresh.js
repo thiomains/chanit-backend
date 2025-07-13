@@ -5,13 +5,17 @@ const {refreshToken} = require("../../../sessions");
 async function refresh(req, res) {
 
     if (!req.cookies.session) {
-        res.status(401).send("Invalid or expired session");
+        res.status(401).send({
+            error: "Invalid or expired session"
+        });
         return;
     }
 
     const session = await sessions.refreshToken(req.cookies.session.sessionId, req.cookies.session.refreshToken);
     if (!session) {
-        res.status(401).send("Invalid or expired session");
+        res.status(401).send({
+            error: "Invalid or expired session"
+        });
         return;
     }
 

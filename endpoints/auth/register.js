@@ -8,19 +8,25 @@ async function register(req, res) {
     const usersCollection = database.collection("users");
 
     if (!req.body.username || !req.body.email || !req.body.password) {
-        res.status(400).send("Bad request");
+        res.status(400).send({
+            error: "Bad request"
+        });
         return;
     }
 
     const checkIfEmailIsTaken = await usersCollection.findOne({email: req.body.email});
     if (checkIfEmailIsTaken) {
-        res.status(409).send("Email is already taken");
+        res.status(409).send({
+            error: "Email is already taken"
+        });
         return;
     }
 
     const checkIfUsernameIsTaken = await usersCollection.findOne({username: req.body.username});
     if (checkIfUsernameIsTaken) {
-        res.status(409).send("Username is already taken");
+        res.status(409).send({
+            error: "Username is already taken"
+        });
         return;
     }
 
@@ -37,7 +43,9 @@ async function register(req, res) {
     await usersCollection.insertOne(user);
 
     const session = await sessions.createSession(user.id, req.headers["user-agent"], req.ip);
-    sessions.setSessionCookieAndSend(res, session, 201, "Account created successfully");
+    sessions.setSessionCookieAndSend(res, session, 201, {
+        message: "Account created successfully"
+    });
 }
 
 module.exports = register;

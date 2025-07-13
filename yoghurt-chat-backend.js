@@ -5,7 +5,10 @@ const cookieParser = require('cookie-parser');
 const authMiddleware = require("./authMiddleware");
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // ← dein Nuxt-Frontend
+    credentials: true // ← wichtig, wenn Cookies mitgeschickt werden!
+}))
 app.use(cookieParser());
 app.use(express.json());
 
