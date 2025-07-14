@@ -39,6 +39,7 @@ async function register(req, res) {
         password: passwordHash,
         createdAt: Date.now(),
         active: true,
+        profile: {}
     }
 
     await usersCollection.insertOne(user);

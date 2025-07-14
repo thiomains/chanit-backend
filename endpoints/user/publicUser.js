@@ -1,10 +1,10 @@
 const users = require('../../users')
 
-async function id(req, res) {
+async function publicUser(req, res) {
 
     const userId = req.params.id;
 
-    const user = users.getPublicUser(userId)
+    const user = await users.getPublicUser(userId)
 
     if (user == null) {
         res.status(404).send({
@@ -17,4 +17,4 @@ async function id(req, res) {
 
 }
 
-module.exports = id;
+module.exports = publicUser;
