@@ -37,7 +37,8 @@ async function register(req, res) {
         username: req.body.username,
         email: req.body.email,
         password: passwordHash,
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        active: true,
     }
 
     await usersCollection.insertOne(user);
