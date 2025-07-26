@@ -1,23 +1,33 @@
 const friends = require('../../friends')
+const users = require('../../users')
 
 // returns mutual friends of authenticated user
 async function get(req, res) {
 
     const userId = req.params.id
+    if (userId === req.auth.user.id || userId === "me") {
+        res.status(200).send(await friends.getFriends(req.auth.user.id))
+        return;
+    }
 
-    res.status(200).send(friends.getMutualFriends(userId, req.auth.user.id))
+    res.status(200).send(await friends.getMutualFriends(userId, req.auth.user.id))
 
 }
 
 // creates or accepts a friend request to a specific user
 async function post(req, res) {
 
-    const userId = req.params.id
+    let userId = req.params.id
     if (userId === req.auth.user.id) {
         res.status(400).send({
             error: "You cannot add yourself as a friend"
         })
         return;
+    }
+
+    if (userId.length <= 16) {
+        const user = await users.getUserByName(userId)
+        userId = user.id
     }
 
     const alreadyFriends = await friends.getFriendship(req.auth.user.id, userId)

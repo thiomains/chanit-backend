@@ -1,10 +1,12 @@
 const db = require('./database')
+const users = require('./users')
+const directChannels = require('./channels')
 
 async function getMutualFriends(otherUserId, selfUserId) {
     // TODO
 }
 
-async function getFriends(userId) {
+async function getFriendships(userId) {
     const database = await db.connectDatabase();
     const friendsCollection = database.collection("friends");
 
@@ -13,6 +15,24 @@ async function getFriends(userId) {
             $all: [userId]
         }
     }).toArray();
+}
+
+async function getFriends(userId) {
+    const friendships = await getFriendships(userId);
+
+    let friends = []
+
+    for (let i = 0; i < friendships.length; i++) {
+        let friendship = friendships[i];
+        friendship.users = friendship.users.filter(item => item !== userId);
+        const friend = {
+            user: await users.getPublicUser(friendship.users[0]),
+            friendsSince: friendship.friendsSince
+        }
+        friends.push(friend)
+    }
+
+    return friends
 }
 
 async function getIncomingFriendRequests(userId) {
@@ -68,8 +88,13 @@ async function addFriends(userId, otherUserId){
         friendsSince: Date.now()
     }
 
+    const directChannel = await directChannels.createDirectChannel(friends)
+    friends.directChannelId = directChannel.channelId
+
     await friendsCollection.insertOne(friends)
 }
+
+
 
 async function removeFriendRequest(userId, otherUserId) {
     const database = await db.connectDatabase();
@@ -92,4 +117,4 @@ async function getFriendship(userId, otherUserId) {
     })
 }
 
-module.exports = { getMutualFriends, createFriendRequest, getIncomingFriendRequests, getOutgoingFriendRequests, getFriends, addFriends, removeFriendRequest, getFriendship, getFriendRequest };
+module.exports = { getMutualFriends, createFriendRequest, getIncomingFriendRequests, getOutgoingFriendRequests, getFriendships, addFriends, removeFriendRequest, getFriendship, getFriendRequest, getFriends };

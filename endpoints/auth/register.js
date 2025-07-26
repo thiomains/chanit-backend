@@ -2,6 +2,7 @@ const db = require("../../database");
 const bcrypt = require("bcrypt");
 const snowflake = require("../../snowflake");
 const sessions = require("../../sessions");
+const users = require('../../users')
 
 async function register(req, res) {
     const database = await db.connectDatabase();
@@ -14,7 +15,21 @@ async function register(req, res) {
         return;
     }
 
-    const checkIfEmailIsTaken = await usersCollection.findOne({email: req.body.email});
+    if (req.body.username.length > 16) {
+        res.status(400).send({
+            error: "Username cannot exceed 16 characters"
+        })
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!req.body.email.match(emailRegex)) {
+        res.status(400).send({
+            error: "Invalid email address"
+        })
+        return;
+    }
+
+    const checkIfEmailIsTaken = await users.getUserByEmail(req.body.email)
     if (checkIfEmailIsTaken) {
         res.status(409).send({
             error: "Email is already taken"
@@ -22,7 +37,7 @@ async function register(req, res) {
         return;
     }
 
-    const checkIfUsernameIsTaken = await usersCollection.findOne({username: req.body.username});
+    const checkIfUsernameIsTaken = await users.getUserByName(req.body.username)
     if (checkIfUsernameIsTaken) {
         res.status(409).send({
             error: "Username is already taken"
@@ -32,17 +47,7 @@ async function register(req, res) {
 
     const passwordHash = await bcrypt.hash(req.body.password, 10);
 
-    const user = {
-        id: snowflake.generateId(),
-        username: req.body.username,
-        email: req.body.email,
-        password: passwordHash,
-        createdAt: Date.now(),
-        active: true,
-        profile: {}
-    }
-
-    await usersCollection.insertOne(user);
+    const user = await users.createAccount(req.body.username, req.body.email, passwordHash)
 
     const session = await sessions.createSession(user.id, req.headers["user-agent"], req.ip);
     sessions.setSessionCookieAndSend(res, session, 201, {
