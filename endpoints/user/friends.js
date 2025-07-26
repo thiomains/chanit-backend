@@ -1,7 +1,6 @@
 const friends = require('../../friends')
 const users = require('../../users')
 
-// returns mutual friends of authenticated user
 async function get(req, res) {
 
     const userId = req.params.id

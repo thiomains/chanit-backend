@@ -27,7 +27,8 @@ async function getFriends(userId) {
         friendship.users = friendship.users.filter(item => item !== userId);
         const friend = {
             user: await users.getPublicUser(friendship.users[0]),
-            friendsSince: friendship.friendsSince
+            friendsSince: friendship.friendsSince,
+            directChannelId: friendship.directChannelId
         }
         friends.push(friend)
     }

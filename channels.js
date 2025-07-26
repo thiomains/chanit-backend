@@ -14,7 +14,8 @@ async function createDirectChannel(friendship) {
         }
     }
 
-    return await channelsCollection.insertOne(channel)
+    await channelsCollection.insertOne(channel)
+    return channel
 }
 
 async function getChannel(channelId) {
