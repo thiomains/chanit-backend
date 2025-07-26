@@ -5,7 +5,10 @@ const cookieParser = require('cookie-parser');
 const authMiddleware = require("./authMiddleware");
 
 const app = express();
-app.use(cors())
+app.use(cors({
+    origin: "https://yoghurt.minescope.eu",
+    credentials: true
+}))
 app.use(cookieParser());
 app.use(express.json());
 
