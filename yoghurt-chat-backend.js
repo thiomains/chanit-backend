@@ -6,7 +6,7 @@ const authMiddleware = require("./authMiddleware");
 
 const app = express();
 app.use(cors({
-    origin: "https://yoghurt.minescope.eu",
+    origin: [ "https://yoghurt.minescope.eu", "http://localhost:3000" ],
     credentials: true
 }))
 app.use(cookieParser());
