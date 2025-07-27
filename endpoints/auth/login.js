@@ -2,7 +2,7 @@ const db = require("../../database");
 const bcrypt = require("bcrypt");
 const sessions = require("../../sessions");
 
-async function register(req, res) {
+async function login(req, res) {
     const database = await db.connectDatabase();
     const usersCollection = database.collection("users");
 
@@ -35,4 +35,4 @@ async function register(req, res) {
     });
 }
 
-module.exports = register;
+module.exports = login;
