@@ -19,7 +19,8 @@ async function post(req, res) {
     const channelId = req.params.id;
     const channel = await channels.getChannel(channelId)
 
+    return await messages.createMessage(req.auth.user.username, req.body.body)
 
 }
 
-module.exports = { get }
+module.exports = { get, post }
