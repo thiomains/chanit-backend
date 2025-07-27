@@ -5,19 +5,31 @@ const sessions = require("../../sessions");
 async function post(req, res) {
     const code = req.body.code
 
-    const faserRes = await axios.post('https://api.faser.app/developer/authToken', {
-        code: code,
-        clientId: process.env.FASER_CLIENT_ID,
-        clientSecret: process.env.FASER_CLIENT_SECRET
-    })
+    let faserRes
+
+    try {
+        faserRes = await axios.post('https://auth.faser.app/developer/authToken', {
+            code: code,
+            clientId: process.env.FASER_CLIENT_ID,
+            clientSecret: process.env.FASER_CLIENT_SECRET
+        })
+    } catch (e) {
+        console.log(e)
+    }
 
     const faserAuthToken = faserRes.data.authToken
 
-    const userData = await axios.post('https://api.faser.app/developer/getData', {
-        accessToken: faserAuthToken,
-        clientId: process.env.FASER_CLIENT_ID,
-        clientSecret: process.env.FASER_CLIENT_SECRET
-    })
+    let userData
+
+    try {
+        userData = await axios.post('https://auth.faser.app/developer/getData', {
+            accessToken: faserAuthToken,
+            clientId: process.env.FASER_CLIENT_ID,
+            clientSecret: process.env.FASER_CLIENT_SECRET
+        })
+    } catch (e) {
+        console.log(e)
+    }
 
     console.log(userData.data)
 
