@@ -11,5 +11,8 @@ async function createMessage(author, body) {
         body: body
     }
 
-    return await messagesCollection.insertOne(message)
+    await messagesCollection.insertOne(message)
+    return message
 }
+
+module.exports = { createMessage }
