@@ -44,7 +44,7 @@ async function refreshToken(sessionId, refreshToken) {
         return null;
     }
 
-    if (session.active === false) {
+    if (!session.active) {
         return null;
     }
 
@@ -77,7 +77,6 @@ function setSessionCookieAndSend(res, session, status, message) {
 
     res.status(status).cookie("session", cookieContent, {
         httpOnly: true,
-        secure: true,
         sameSite: "strict",
         maxAge: 1000 * 60 * 60 * 24 * 7,
         path: "/api/auth/"
@@ -128,7 +127,6 @@ async function validateAccess(sessionId, accessToken) {
         return [];
     }
     const user = await usersCollection.findOne({id: session.userId});
-    console.log(user)
     if (!user.active) {
         return [];
     }
