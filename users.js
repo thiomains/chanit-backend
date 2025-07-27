@@ -87,8 +87,6 @@ async function getUserByFaser(faser) {
     const user = await usersCollection.findOne({
         faserId: faser
     });
-    console.log("ich ahoi")
-    console.log(user)
     if (!user) {
         return null;
     }
