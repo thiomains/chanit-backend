@@ -12,7 +12,7 @@ async function get(req, res) {
         return
     }
 
-    const channelMessages = await (await messages.getMessages(channelId)).toArray()
+    const channelMessages = await messages.getMessages(channelId)
     
     res.status(200).send(channelMessages)
 }

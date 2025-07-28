@@ -17,15 +17,39 @@ async function createMessage(channelId, author, body) {
     return message
 }
 
-async function getMessages(channelId, limit) {
-
-    const documentLimit = limit || 50
+async function getMessages(channelId) {
 
     const database = await db.connectDatabase()
     const messagesCollection = database.collection("messages")
-    return messagesCollection.find({
-        channelId: channelId
-    })
+    return await (await messagesCollection.aggregate([
+        {
+            $match: {
+                channelId: channelId
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "author",
+                foreignField: "id",
+                as: "author"
+            }
+        },
+        {
+            $unwind: "$author"
+        },
+        {
+            $project: {
+                messageId: 1,
+                channelId: 1,
+                createdAt: 1,
+                body: 1,
+                "author.id": 1,
+                "author.username": 1,
+                "author.createdAt": 1
+            }
+        }
+    ])).toArray()
 }
 
 module.exports = { createMessage, getMessages }
