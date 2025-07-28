@@ -48,6 +48,14 @@ async function getMessages(channelId) {
                 "author.username": 1,
                 "author.createdAt": 1
             }
+        },
+        {
+            $sort: {
+                createdAt: -1
+            }
+        },
+        {
+            $limit: 50
         }
     ])).toArray()
 }
