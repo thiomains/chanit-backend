@@ -11,6 +11,7 @@ app.use(cors({
 }))
 app.use(cookieParser());
 app.use(express.json());
+const expressWs = require("express-ws")(app)
 
 app.use('/api/auth/me', authMiddleware)
 app.use('/api/user/', authMiddleware)
@@ -19,6 +20,8 @@ app.use('/api/channel/', authMiddleware)
 app.get('/', (req, res) => {
     res.send('helo');
 })
+
+app.ws("/events", require('./events').ws)
 
 app.post('/api/auth/register', require('./endpoints/auth/register'))
 app.post('/api/auth/faser', require('./endpoints/auth/faser').post)
