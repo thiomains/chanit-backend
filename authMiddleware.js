@@ -6,7 +6,6 @@ async function authMiddleware(req, res, next) {
     const sessionId = req.headers.session;
 
     if (!authHeader || !sessionId) {
-        console.log(authHeader, sessionId)
         res.status(401).send("Invalid or expired session");
         return;
     }
