@@ -40,6 +40,23 @@ async function getUserByName(username) {
     return user
 }
 
+async function getUser(userId) {
+    const database = await db.connectDatabase();
+    const usersCollection = database.collection("users");
+
+    const user = await usersCollection.findOne({
+        id: userId
+    });
+    if (!user) {
+        return null;
+    }
+    if (!user.active) {
+        return null;
+    }
+
+    return user
+}
+
 async function getUserByEmail(emailAddress) {
     const database = await db.connectDatabase();
     const usersCollection = database.collection("users");
@@ -97,4 +114,4 @@ async function getUserByFaser(faser) {
     return user
 }
 
-module.exports = { getPublicUser, getUserByName, getUserByEmail, createAccount, getUserByFaser };
+module.exports = { getPublicUser, getUserByName, getUserByEmail, createAccount, getUserByFaser, getUser };
