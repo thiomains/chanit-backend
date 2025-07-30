@@ -33,8 +33,9 @@ async function post(req, res) {
 
     res.status(201).send(message)
 
+    channels.setLastMessage(channelId, message)
+
     message.author = await users.getPublicUser(req.auth.user.id)
-    console.log(message)
 
     currentChannel.sendToChannel(channelId, {
         type: "message",

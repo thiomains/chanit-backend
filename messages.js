@@ -10,7 +10,6 @@ async function createMessage(channelId, author, body) {
         createdAt: Date.now(),
         author: author,
         body: body,
-        deleted: false
     }
 
     await messagesCollection.insertOne(message)
