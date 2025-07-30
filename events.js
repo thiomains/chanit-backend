@@ -63,6 +63,7 @@ async function ws(ws, req) {
         } else if (data.type === "typing") {
             currentChannel.sendToChannel(data.channelId, {
                 type: "typing",
+                channelId: data.channelId,
                 userId: ws.userId
             })
         }
