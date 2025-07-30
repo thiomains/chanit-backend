@@ -1,6 +1,8 @@
 const channels = require("../../channels")
 const messages = require("../../messages")
 const {createMessage} = require("../../messages");
+const currentChannel = require("../../currentChannel")
+const users = require("../../users")
 
 async function get(req, res) {
     const channelId = req.params.id;
@@ -30,6 +32,14 @@ async function post(req, res) {
     const message = await messages.createMessage(channelId, req.auth.user.id, req.body.body)
 
     res.status(201).send(message)
+
+    message.author = await users.getPublicUser(req.auth.user.id)
+    console.log(message)
+
+    currentChannel.sendToChannel(channelId, {
+        type: "message",
+        message: message
+    })
 
 }
 
