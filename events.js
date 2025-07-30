@@ -8,11 +8,6 @@ async function ws(ws, req) {
     const accessToken = req.query.token;
     const sessionId = req.query.session;
 
-    console.log(typeof sessionId)
-
-    console.log(accessToken)
-    console.log(sessionId)
-
     if (!accessToken || !sessionId) {
         ws.send(JSON.stringify({
             type: "authentication-failure",
@@ -41,7 +36,7 @@ async function ws(ws, req) {
     }
 
     ws.send(JSON.stringify({
-        type: "authentication-sucess",
+        type: "authentication-success",
         message: "Successfully authenticated"
     }))
 
