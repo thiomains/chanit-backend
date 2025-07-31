@@ -40,18 +40,95 @@ async function getIncomingFriendRequests(userId) {
     const database = await db.connectDatabase();
     const friendRequestsCollection = database.collection("friendRequests");
 
-    return await friendRequestsCollection.find({
-        recipient: userId
-    }).toArray()
+    return await friendRequestsCollection.aggregate([
+        {
+            $match: {
+                recipient: userId
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "recipient",
+                foreignField: "id",
+                as: "recipientUser"
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "sender",
+                foreignField: "id",
+                as: "senderUser"
+            }
+        },
+        { $unwind: "$recipientUser" },
+        { $unwind: "$senderUser" },
+        {
+            $project: {
+                _id: 0,
+                createdAt: 1,
+                recipient: {
+                    userId: "$recipientUser.id",
+                    username: "$recipientUser.username",
+                    createdAt: "$recipientUser.createdAt"
+                },
+                sender: {
+                    userId: "$senderUser.id",
+                    username: "$senderUser.username",
+                    createdAt: "$senderUser.createdAt"
+                }
+            }
+        }
+    ]).toArray();
+
 }
 
 async function getOutgoingFriendRequests(userId) {
     const database = await db.connectDatabase();
     const friendRequestsCollection = database.collection("friendRequests");
 
-    return await friendRequestsCollection.find({
-        sender: userId
-    }).toArray()
+    return await friendRequestsCollection.aggregate([
+        {
+            $match: {
+                sender: userId
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "recipient",
+                foreignField: "id",
+                as: "recipientUser"
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "sender",
+                foreignField: "id",
+                as: "senderUser"
+            }
+        },
+        { $unwind: "$recipientUser" },
+        { $unwind: "$senderUser" },
+        {
+            $project: {
+                _id: 0,
+                createdAt: 1,
+                recipient: {
+                    userId: "$recipientUser.id",
+                    username: "$recipientUser.username",
+                    createdAt: "$recipientUser.createdAt"
+                },
+                sender: {
+                    userId: "$senderUser.id",
+                    username: "$senderUser.username",
+                    createdAt: "$senderUser.createdAt"
+                }
+            }
+        }
+    ]).toArray();
 }
 
 async function getFriendRequest(userId, otherUserId) {
