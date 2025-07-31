@@ -1,6 +1,18 @@
 const db = require('./database')
 const snowflake = require('./snowflake')
 
+async function hasChannelAccess(userId, channel) {
+    if (channel.channelType === "direct-message") {
+        let members = channel.directMessageChannel.members
+        let hasAccess = false
+        for (user of members) {
+            if (user.userId === req.auth.user.id) hasAccess = true
+            break
+        }
+        return hasAccess
+    }
+}
+
 async function setLastMessage(channelId, message) {
     const database = await db.connectDatabase();
     const channelsCollection = database.collection("channels");
@@ -194,4 +206,4 @@ async function getChannel(channelId) {
     return channel
 }
 
-module.exports = { getFriendDirectChannel, getChannel, setLastMessage, getRecentDirectChannels }
+module.exports = { getFriendDirectChannel, getChannel, setLastMessage, getRecentDirectChannels, hasChannelAccess }
