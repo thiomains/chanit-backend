@@ -195,4 +195,12 @@ async function getFriendship(userId, otherUserId) {
     })
 }
 
-module.exports = { getMutualFriends, createFriendRequest, getIncomingFriendRequests, getOutgoingFriendRequests, getFriendships, addFriends, removeFriendRequest, getFriendship, getFriendRequest, getFriends };
+async function removeFriends(userId, otherUserId) {
+    const database = await db.connectDatabase();
+    const friendsCollection = database.collection("friends");
+    await friendsCollection.deleteOne({
+        users: { $all: [userId, otherUserId] }
+    })
+}
+
+module.exports = { getMutualFriends, createFriendRequest, getIncomingFriendRequests, getOutgoingFriendRequests, getFriendships, addFriends, removeFriendRequest, getFriendship, getFriendRequest, getFriends, removeFriends };

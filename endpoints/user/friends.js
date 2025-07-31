@@ -26,6 +26,9 @@ async function post(req, res) {
 
     if (userId.length <= 16) {
         const user = await users.getUserByName(userId)
+        if (!user) res.status(404).send({
+            error: "User not found"
+        })
         userId = user.id
     }
 
@@ -62,4 +65,41 @@ async function post(req, res) {
 
 }
 
-module.exports = { get, post }
+async function remove(req, res) {
+    const userId = req.auth.user.id
+    const friendUserId = req.params.id
+    if (userId === friendUserId) {
+        res.status(400).send({
+            error: "You cannot remove yourself as a friend"
+        })
+        return;
+    }
+    const alreadyRequested = await friends.getFriendRequest(userId, friendUserId)
+    if (alreadyRequested) {
+        await friends.removeFriendRequest(userId, friendUserId)
+        res.status(204).send({
+            message: "Cancelled friend request"
+        })
+        return;
+    }
+    const receivedRequest = await friends.getFriendRequest(friendUserId, userId)
+    if (receivedRequest) {
+        await friends.removeFriendRequest(friendUserId, userId)
+        res.status(204).send({
+            message: "Declined friend request"
+        })
+    }
+    const alreadyFriends = await friends.getFriendship(userId, friendUserId)
+    if (alreadyFriends) {
+        await friends.removeFriends(userId, friendUserId)
+        res.status(204).send({
+            message: "Removed friend"
+        })
+        return;
+    }
+    res.status(404).send({
+        error: "No friendship or pending friend request exists with this user"
+    })
+}
+
+module.exports = { get, post, remove }

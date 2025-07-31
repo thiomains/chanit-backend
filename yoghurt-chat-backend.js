@@ -33,6 +33,7 @@ app.get('/api/auth/me', require('./endpoints/auth/me'))
 app.get('/api/user/:id', require('./endpoints/user/publicUser'))
 app.get('/api/user/:id/friends', require('./endpoints/user/friends').get)
 app.post('/api/user/:id/friends', require('./endpoints/user/friends').post)
+app.delete('/api/user/:id/friends', require('./endpoints/user/friends').remove)
 app.get('/api/user/:id/friends/requests', require('./endpoints/user/friends/requests').get)
 app.get('/api/user/me/recent', require('./endpoints/user/recent').get)
 
