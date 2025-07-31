@@ -42,39 +42,96 @@ async function getRecentDirectChannels(userId) {
             }
         },
         {
+            $lookup: {
+                from: "users",
+                localField: "directMessageChannel.members",
+                foreignField: "id",
+                as: "memberUsers"
+            }
+        },
+        {
             $addFields: {
                 lastMessage: {
-                    $mergeObjects: [
-                        "$lastMessage",
-                        {
-                            author: {
-                                userId: "$authorInfo.id",
-                                username: "$authorInfo.username",
-                                createdAt: "$authorInfo.createdAt"
-                            }
+                    $cond: {
+                        if: { $gt: [{ $type: "$lastMessage" }, "missing"] },
+                        then: {
+                            $mergeObjects: [
+                                "$lastMessage",
+                                {
+                                    author: {
+                                        userId: "$authorInfo.id",
+                                        username: "$authorInfo.username",
+                                        createdAt: "$authorInfo.createdAt"
+                                    }
+                                }
+                            ]
+                        },
+                        else: null
+                    }
+                },
+                'directMessageChannel.members': {
+                    $map: {
+                        input: "$memberUsers",
+                        as: "user",
+                        in: {
+                            userId: "$$user.id",
+                            username: "$$user.username",
+                            createdAt: "$$user.createdAt"
                         }
-                    ]
+                    }
                 }
             }
         },
         {
             $project: {
-                authorInfo: 0
+                authorInfo: 0,
+                memberUsers: 0
             }
         }
-    ]).toArray()
+    ]).toArray();
 }
 
 async function getFriendDirectChannel(friendship) {
     const database = await db.connectDatabase();
     const channelsCollection = database.collection("channels");
-    const directChannel = await channelsCollection.findOne({
-        channelType: "direct-message",
-        "directMessageChannel.members": {
-            $all: friendship.users,
-            $size: 2
+    const directChannel = await (await (await channelsCollection.aggregate([
+        {
+            $match: {
+                channelType: "direct-message",
+                "directMessageChannel.members": {
+                    $all: friendship.users,
+                    $size: 2
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "directMessageChannel.members",
+                foreignField: "id",
+                as: "memberUsers"
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                channelId: 1,
+                createdAt: 1,
+                lastMessage: 1,
+                members: {
+                    $map: {
+                        input: "$memberUsers",
+                        as: "user",
+                        in: {
+                            userId: "$$user.id",
+                            username: "$$user.username",
+                            createdAt: "$$user.createdAt"
+                        }
+                    }
+                }
+            }
         }
-    });
+    ])).toArray())[0]
     if (directChannel) return directChannel
     const channel = {
         channelType: "direct-message",
@@ -87,15 +144,54 @@ async function getFriendDirectChannel(friendship) {
     }
 
     await channelsCollection.insertOne(channel)
-    return channel
+    return getFriendDirectChannel(friendship)
 }
 
 async function getChannel(channelId) {
     const database = await db.connectDatabase();
     const channelsCollection = database.collection("channels");
-    return await channelsCollection.findOne({
+    let channel = await channelsCollection.findOne({
         channelId: channelId
     })
+    if (channel.channelType === "direct-message") {
+        channel = await (await (await channelsCollection.aggregate([
+            {
+                $match: {
+                    channelId: channelId
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "directMessageChannel.members",
+                    foreignField: "id",
+                    as: "memberUsers"
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    channelId: 1,
+                    createdAt: 1,
+                    lastMessage: 1,
+                    channelType: 1,
+                    "directMessageChannel.createdAt": 1,
+                    "directMessageChannel.members": {
+                        $map: {
+                            input: "$memberUsers",
+                            as: "user",
+                            in: {
+                                userId: "$$user.id",
+                                username: "$$user.username",
+                                createdAt: "$$user.createdAt"
+                            }
+                        }
+                    }
+                }
+            }
+        ])).toArray())[0];
+    }
+    return channel
 }
 
 module.exports = { getFriendDirectChannel, getChannel, setLastMessage, getRecentDirectChannels }
