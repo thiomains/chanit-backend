@@ -17,12 +17,6 @@ async function get(req, res) {
 async function post(req, res) {
 
     let userId = req.params.id
-    if (userId === req.auth.user.id) {
-        res.status(400).send({
-            error: "You cannot add yourself as a friend"
-        })
-        return;
-    }
 
     if (userId.length <= 16) {
         const user = await users.getUserByName(userId)
@@ -33,6 +27,13 @@ async function post(req, res) {
             return;
         }
         userId = user.id
+    }
+
+    if (userId === req.auth.user.id) {
+        res.status(400).send({
+            error: "You cannot add yourself as a friend"
+        })
+        return;
     }
 
     const alreadyFriends = await friends.getFriendship(req.auth.user.id, userId)
