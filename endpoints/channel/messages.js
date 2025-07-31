@@ -18,6 +18,7 @@ async function get(req, res) {
         res.status(403).send({
             error: "You are not permitted to access messages of this channel"
         })
+        return
     }
 
     const channelMessages = await messages.getMessages(channelId)

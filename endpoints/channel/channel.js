@@ -15,6 +15,7 @@ async function get(req, res) {
         res.status(403).send({
             error: "You are not permitted to access this channel"
         })
+        return
     }
 
     res.status(200).send(channel)
