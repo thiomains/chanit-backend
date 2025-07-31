@@ -18,20 +18,54 @@ async function getFriendships(userId) {
 }
 
 async function getFriends(userId) {
-    const friendships = await getFriendships(userId);
-
-    let friends = []
-
-    for (let i = 0; i < friendships.length; i++) {
-        let friendship = friendships[i];
-        friendship.users = friendship.users.filter(item => item !== userId);
-        const friend = {
-            user: await users.getPublicUser(friendship.users[0]),
-            friendsSince: friendship.friendsSince,
-            directChannelId: friendship.directChannelId
+    const database = await db.connectDatabase();
+    const friendsCollection = database.collection("friends");
+    const friends = await (await (await friendsCollection.aggregate([
+        {
+            $match: {
+                users: userId
+            }
+        },
+        {
+            $addFields: {
+                friendId: {
+                    $arrayElemAt: [
+                        {
+                            $filter: {
+                                input: "$users",
+                                as: "id",
+                                cond: { $ne: ["$$id", userId] }
+                            }
+                        },
+                        0
+                    ]
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "friendId",
+                foreignField: "id",
+                as: "friend"
+            }
+        },
+        {
+            $unwind: "$friend"
+        },
+        {
+            $project: {
+                _id: 0,
+                friendsSince: 1,
+                directChannelId: 1,
+                user: {
+                    userId: "$friend.id",
+                    username: "$friend.username",
+                    createdAt: "$friend.createdAt"
+                }
+            }
         }
-        friends.push(friend)
-    }
+    ])).toArray());
 
     return friends
 }
