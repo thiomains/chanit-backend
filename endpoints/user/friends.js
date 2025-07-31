@@ -26,9 +26,12 @@ async function post(req, res) {
 
     if (userId.length <= 16) {
         const user = await users.getUserByName(userId)
-        if (!user) res.status(404).send({
-            error: "User not found"
-        })
+        if (!user) {
+            res.status(404).send({
+                error: "User not found"
+            })
+            return;
+        }
         userId = user.id
     }
 
