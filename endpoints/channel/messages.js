@@ -14,7 +14,7 @@ async function get(req, res) {
         return
     }
 
-    if (!await channels.hasChannelAccess(req.auth.user.id, channelId)) {
+    if (!await channels.hasChannelAccess(req.auth.user.id, channel)) {
         res.status(403).send({
             error: "You are not permitted to access messages of this channel"
         })

@@ -6,8 +6,10 @@ async function hasChannelAccess(userId, channel) {
         let members = channel.directMessageChannel.members
         let hasAccess = false
         for (user of members) {
-            if (user.userId === req.auth.user.id) hasAccess = true
-            break
+            if (user.userId === userId) {
+                hasAccess = true
+                break
+            }
         }
         return hasAccess
     }
