@@ -1,5 +1,6 @@
 const currentChannel = require("./currentChannel")
 const sessions = require("./sessions");
+const friends = require("./friends");
 
 let socketConnections = new Map()
 
@@ -44,6 +45,7 @@ async function ws(ws, req) {
 
     if (!socketConnections.has(userId)) {
         socketConnections.set(userId, new Set())
+        sendOnline(userId, true)
     }
     socketConnections.get(userId).add(ws)
     ws.userId = userId
@@ -53,6 +55,7 @@ async function ws(ws, req) {
         set.delete(ws)
         if (set.size === 0) {
             socketConnections.delete(ws.userId)
+            sendOnline(userId, false)
         }
     })
 
@@ -70,12 +73,25 @@ async function ws(ws, req) {
     })
 }
 
-async function sendMessage(userId, message) {
+function sendMessage(userId, message) {
     const msgString = JSON.stringify(message)
     const connectionSet = socketConnections.get(userId)
     if (!connectionSet) return
     for (ws of connectionSet) {
         ws.send(msgString)
+    }
+}
+
+async function sendOnline(userId, online) {
+    const friendList = await friends.getFriends(userId)
+    if (!friendList) return
+    if (friendList.length === 0) return
+    for (friend of friendList) {
+        sendMessage(friend.user.userId, {
+            type: "online-status",
+            userId: userId,
+            status: online ? "online" : "offline"
+        })
     }
 }
 
