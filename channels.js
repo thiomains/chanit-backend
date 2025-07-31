@@ -65,9 +65,17 @@ async function getRecentDirectChannels(userId) {
     ]).toArray()
 }
 
-async function createDirectChannel(friendship) {
+async function getFriendDirectChannel(friendship) {
     const database = await db.connectDatabase();
     const channelsCollection = database.collection("channels");
+    const directChannel = await channelsCollection.findOne({
+        channelType: "direct-message",
+        "directMessageChannel.members": {
+            $all: friendship.users,
+            $size: 2
+        }
+    });
+    if (directChannel) return directChannel
     const channel = {
         channelType: "direct-message",
         channelId: snowflake.generateId(),
@@ -90,4 +98,4 @@ async function getChannel(channelId) {
     })
 }
 
-module.exports = { createDirectChannel, getChannel, setLastMessage, getRecentDirectChannels }
+module.exports = { getFriendDirectChannel, getChannel, setLastMessage, getRecentDirectChannels }

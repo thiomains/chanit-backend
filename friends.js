@@ -166,7 +166,7 @@ async function addFriends(userId, otherUserId){
         friendsSince: Date.now()
     }
 
-    const directChannel = await directChannels.createDirectChannel(friends)
+    const directChannel = await directChannels.getFriendDirectChannel(friends)
     friends.directChannelId = directChannel.channelId
 
     await friendsCollection.insertOne(friends)
