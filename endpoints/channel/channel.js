@@ -5,14 +5,13 @@ async function get(req, res) {
     const channel = await channels.getChannel(channelId)
 
     if (!channel) {
-        res.status(400).send({
+        res.status(404).send({
             error: "Channel not found"
         })
+        return;
     }
 
-    res.status(200).send({
-        channel
-    })
+    res.status(200).send(channel)
 }
 
 module.exports = { get }
