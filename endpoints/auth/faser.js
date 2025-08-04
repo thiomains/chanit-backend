@@ -79,7 +79,7 @@ function modifyString(inputString) {
     const firstPart = paddedString.slice(0, 10);
 
     // Generiere 4 zufällige Zeichen (a-Z und 0-1)
-    const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01';
+    const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let randomPart = '';
     for (let i = 0; i < 4; i++) {
         const randomIndex = Math.floor(Math.random() * characters.length);
