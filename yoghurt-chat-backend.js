@@ -16,7 +16,7 @@ const expressWs = require("express-ws")(app)
 app.use('/api/auth/me', authMiddleware)
 app.use('/api/user/', authMiddleware)
 app.use('/api/channel/', authMiddleware)
-app.use('/api/attachments/', authMiddleware)
+app.use('/api/message/', authMiddleware)
 
 app.get('/', (req, res) => {
     res.send('helo');
@@ -41,7 +41,8 @@ app.get('/api/user/me/recent', require('./endpoints/user/recent').get)
 app.get('/api/channel/:id', require('./endpoints/channel/channel').get)
 app.get('/api/channel/:id/messages', require('./endpoints/channel/messages').get)
 app.post('/api/channel/:id/messages', require('./endpoints/channel/messages').post)
-app.post('/api/attachments/:id/', require('./fileUpload').upload.single('attachment'), require('./endpoints/channel/attachments').post)
+
+app.post('/api/message/:id/attachments', require('./fileUpload').upload.single('attachment'), require('./endpoints/channel/attachments').post)
 
 app.listen(process.env.PORT, () => {
     console.log("App listening on port " + process.env.PORT);
