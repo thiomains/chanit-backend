@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "aws-sdk": "^2.1692.0",
     "axios": "^1.10.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
@@ -7,6 +8,7 @@
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "express-ws": "^5.0.2",
-    "mongodb": "^6.17.0"
+    "mongodb": "^6.17.0",
+    "multer": "^2.0.2"
   }
 }

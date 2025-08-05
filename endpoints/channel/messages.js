@@ -36,18 +36,23 @@ async function post(req, res) {
         return
     }
 
-    const message = await messages.createMessage(channelId, req.auth.user.id, req.body.body)
+    let attachments = req.body.attachmentCount
+    if (!attachments) attachments = 0
+
+    const message = await messages.createMessage(channelId, req.auth.user.id, req.body.body, attachments)
 
     res.status(201).send(message)
 
-    channels.setLastMessage(channelId, message)
+    await channels.setLastMessage(channelId, message)
 
     message.author = await users.getPublicUser(req.auth.user.id)
 
-    currentChannel.sendToChannel(channelId, {
-        type: "message",
-        message: message
-    })
+    if (message.attachments.length === 0) {
+        currentChannel.sendToChannel(channelId, {
+            type: "message",
+            message: message
+        })
+    }
 
 }
 

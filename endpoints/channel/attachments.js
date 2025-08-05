@@ -1,0 +1,87 @@
+const messages = require("../../messages")
+
+const AWS = require('aws-sdk');
+const currentChannel = require("../../currentChannel");
+const s3 = new AWS.S3({
+    endpoint: process.env.S3_SERVER,
+    accessKeyId: process.env.S3_ACCESS_KEY,
+    secretAccessKey: process.env.S3_SECRET_KEY,
+    s3ForcePathStyle: true,
+});
+
+async function post(req, res) {
+
+    const message = await messages.getMessage(req.params.id)
+    if (!message) {
+        res.status(404).send({
+            error: 'Message not found'
+        });
+        return
+    }
+
+    if (req.auth.user.id !== message.author.id) {
+        res.status(403).send({
+            error: 'You are not the author of this message'
+        });
+        return
+    }
+
+    const messageAttachments = message.attachments
+    if (!messageAttachments) {
+        res.status(400).send({
+            error: 'No attachments to upload'
+        });
+        return
+    }
+    let attachmentIndex = -1
+    for (let i = 0; i < messageAttachments.length; i++) {
+        if (messageAttachments[i].url === "") {
+            attachmentIndex = i
+            break
+        }
+    }
+    if (attachmentIndex === -1) {
+        res.status(400).send({
+            error: 'No attachments to upload'
+        });
+        return
+    }
+
+    if (!req.file) {
+        res.status(400).send({
+            error: 'No file sent'
+        });
+        return
+    }
+
+    const key = message.channelId + "/" + message.messageId + "/" + req.file.originalname
+
+    const url = "https://cdn.minescope.eu/attachments/" + key.replaceAll(" ", "%20")
+
+    await messages.setAttachmentUrl(message.messageId, attachmentIndex, url)
+
+    res.status(203).send({
+        fileUrl: url
+    })
+
+    const params = {
+        Bucket: "attachments",
+        Key: key,
+        Body: req.file.buffer,
+        ContentType: req.file.mimetype,
+    };
+
+    await s3.upload(params).promise();
+
+    if (message.attachments.length !== attachmentIndex + 1) {
+        return;
+    }
+    message.attachments[attachmentIndex].url = url
+    currentChannel.sendToChannel(message.channelId, {
+        type: "message",
+        message: message
+    })
+
+}
+
+module.exports = { post }
