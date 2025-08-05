@@ -108,13 +108,13 @@ async function getMessage(messageId) {
     ])).toArray())[0]
 }
 
-async function setAttachmentUrl(messageId, index, url) {
+async function setAttachment(messageId, index, attachment) {
     const database = await db.connectDatabase()
     const messagesCollection = database.collection("messages")
     await messagesCollection.updateOne(
         { messageId: messageId },
-        { $set: { [`attachments.${index}.url`]: url } }
+        { $set: { [`attachments.${index}`]: attachment } }
     );
 }
 
-module.exports = { createMessage, getMessages, getMessage, setAttachmentUrl }
+module.exports = { createMessage, getMessages, getMessage, setAttachment }

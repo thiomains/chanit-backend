@@ -1,4 +1,5 @@
 const messages = require("../../messages")
+const snowflake = require("../../snowflake")
 
 const AWS = require('aws-sdk');
 const currentChannel = require("../../currentChannel");
@@ -54,11 +55,20 @@ async function post(req, res) {
         return
     }
 
-    const key = message.channelId + "/" + message.messageId + "/" + req.file.originalname
+    const attachmentId = snowflake.generateId()
+
+    const key = message.channelId + "/" + message.messageId + "/" + attachmentId + "/" + req.file.originalname
 
     const url = "https://cdn.minescope.eu/attachments/" + key.replaceAll(" ", "%20")
 
-    await messages.setAttachmentUrl(message.messageId, attachmentIndex, url)
+    const attachment = {
+        url: url,
+        mimetype: req.file.mimetype,
+        attachmentId: attachmentId,
+        fileName: req.file.originalname
+    }
+
+    await messages.setAttachment(message.messageId, attachmentIndex, attachment)
 
     res.status(203).send({
         fileUrl: url
@@ -76,7 +86,7 @@ async function post(req, res) {
     if (message.attachments.length !== attachmentIndex + 1) {
         return;
     }
-    message.attachments[attachmentIndex].url = url
+    message.attachments[attachmentIndex] = attachment
     currentChannel.sendToChannel(message.channelId, {
         type: "message",
         message: message
