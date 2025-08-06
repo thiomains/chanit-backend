@@ -65,7 +65,8 @@ async function post(req, res) {
         url: url,
         mimetype: req.file.mimetype,
         attachmentId: attachmentId,
-        fileName: req.file.originalname
+        fileName: req.file.originalname,
+        fileSize: req.file.size
     }
 
     await messages.setAttachment(message.messageId, attachmentIndex, attachment)
