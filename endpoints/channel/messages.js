@@ -21,7 +21,10 @@ async function get(req, res) {
         return
     }
 
-    const channelMessages = await messages.getMessages(channelId)
+    let before = parseInt(req.query.before) ? parseInt(req.query.before) : Date.now()
+    let limit = parseInt(req.query.limit) ? parseInt(req.query.limit) : 50
+
+    const channelMessages = await messages.getMessages(channelId, before, limit)
     
     res.status(200).send(channelMessages)
 }

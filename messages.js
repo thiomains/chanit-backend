@@ -23,14 +23,16 @@ async function createMessage(channelId, author, body, attachmentCount) {
     return message
 }
 
-async function getMessages(channelId) {
-
+async function getMessages(channelId, beforeTimestamp, limit) {
     const database = await db.connectDatabase()
     const messagesCollection = database.collection("messages")
     return await (await messagesCollection.aggregate([
         {
             $match: {
-                channelId: channelId
+                channelId: channelId,
+                createdAt: {
+                    $lt: beforeTimestamp
+                }
             }
         },
         {
@@ -62,7 +64,7 @@ async function getMessages(channelId) {
             }
         },
         {
-            $limit: 50
+            $limit: limit
         }
     ])).toArray()
 }
