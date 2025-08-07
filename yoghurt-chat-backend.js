@@ -42,7 +42,7 @@ app.get('/api/channel/:id', require('./endpoints/channel/channel').get)
 app.get('/api/channel/:id/messages', require('./endpoints/channel/messages').get)
 app.post('/api/channel/:id/messages', require('./endpoints/channel/messages').post)
 
-app.post('/api/message/:id/attachments', require('./fileUpload').upload.single('attachment'), require('./endpoints/channel/attachments').post)
+app.post('/api/message/:id/attachments', require('./fileUpload').upload.single('attachment'), require('./endpoints/message/attachments').post)
 
 app.listen(process.env.PORT, () => {
     console.log("App listening on port " + process.env.PORT);
