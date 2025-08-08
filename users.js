@@ -85,7 +85,6 @@ async function createAccount(username, email, passwordHash, faserId) {
         password: passwordHash,
         createdAt: Date.now(),
         active: true,
-        profile: {},
     }
 
     if (faserId) {

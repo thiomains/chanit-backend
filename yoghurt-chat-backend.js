@@ -32,6 +32,7 @@ app.post('/api/auth/session/refresh', require('./endpoints/auth/session/refresh'
 app.get('/api/auth/me', require('./endpoints/auth/me'))
 
 app.get('/api/user/:id', require('./endpoints/user/publicUser'))
+app.get('/api/user/:id/profile', require('./endpoints/user/profile').get)
 app.get('/api/user/:id/friends', require('./endpoints/user/friends').get)
 app.post('/api/user/:id/friends', require('./endpoints/user/friends').post)
 app.delete('/api/user/:id/friends', require('./endpoints/user/friends').remove)

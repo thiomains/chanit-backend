@@ -1,6 +1,7 @@
 const users = require('../../users')
 const axios = require('axios')
 const sessions = require("../../sessions");
+const profiles = require("../../profiles")
 
 async function post(req, res) {
     const code = req.body.code
@@ -44,6 +45,9 @@ async function post(req, res) {
         sessions.setSessionCookieAndSend(res, session, 200, {
             message: "Logged in successfully"
         });
+
+        const profile = await profiles.getProfile(userExists.id)
+        if (profile.profilePictureUrl === "" || profile.profilePictureUrl.startsWith("https://cdn.faser.app/profile-pictures/")) await profiles.updateProfilePictureUrl(userExists.id, userData.data.data.avatar)
         return;
     }
 
@@ -69,6 +73,8 @@ async function post(req, res) {
     sessions.setSessionCookieAndSend(res, session, 201, {
         message: "Account created successfully"
     });
+
+    await profiles.updateProfilePictureUrl(user.id, userData.data.data.avatar)
 }
 
 function modifyString(inputString) {

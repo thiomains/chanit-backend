@@ -1,13 +1,10 @@
-const sessions = require("../../sessions");
+const profiles = require('./../../profiles')
 
 async function me(req, res) {
 
-    res.status(200).send({
-        userId: req.auth.user.id,
-        username: req.auth.user.username,
-        email: req.auth.user.email,
-        createdAt: req.auth.user.createdAt,
-    });
+    const profile = await profiles.getProfile(req.auth.user.id)
+
+    res.status(200).send(profile);
 
 }
 

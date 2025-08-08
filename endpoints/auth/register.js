@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const snowflake = require("../../snowflake");
 const sessions = require("../../sessions");
 const users = require('../../users')
+const profiles = require("../../profiles");
 
 async function register(req, res) {
     const database = await db.connectDatabase();
@@ -61,6 +62,8 @@ async function register(req, res) {
     sessions.setSessionCookieAndSend(res, session, 201, {
         message: "Account created successfully"
     });
+
+    await profiles.createProfile(user)
 }
 
 module.exports = register;

@@ -43,9 +43,9 @@ async function getRecentDirectChannels(userId) {
         },
         {
             $lookup: {
-                from: "users",
+                from: "profiles",
                 localField: "lastMessage.author",
-                foreignField: "id",
+                foreignField: "userId",
                 as: "authorInfo"
             }
         },
@@ -57,10 +57,10 @@ async function getRecentDirectChannels(userId) {
         },
         {
             $lookup: {
-                from: "users",
+                from: "profiles",
                 localField: "directMessageChannel.members",
-                foreignField: "id",
-                as: "memberUsers"
+                foreignField: "userId",
+                as: "memberProfiles"
             }
         },
         {
@@ -71,35 +71,19 @@ async function getRecentDirectChannels(userId) {
                         then: {
                             $mergeObjects: [
                                 "$lastMessage",
-                                {
-                                    author: {
-                                        userId: "$authorInfo.id",
-                                        username: "$authorInfo.username",
-                                        createdAt: "$authorInfo.createdAt"
-                                    }
-                                }
+                                { author: "$authorInfo" } // komplettes Profile-Dokument
                             ]
                         },
                         else: null
                     }
                 },
-                'directMessageChannel.members': {
-                    $map: {
-                        input: "$memberUsers",
-                        as: "user",
-                        in: {
-                            userId: "$$user.id",
-                            username: "$$user.username",
-                            createdAt: "$$user.createdAt"
-                        }
-                    }
-                }
+                "directMessageChannel.members": "$memberProfiles" // alle kompletten Profile
             }
         },
         {
             $project: {
                 authorInfo: 0,
-                memberUsers: 0
+                memberProfiles: 0
             }
         }
     ]).toArray();

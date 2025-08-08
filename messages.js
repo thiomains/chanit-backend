@@ -37,26 +37,14 @@ async function getMessages(channelId, beforeTimestamp, limit) {
         },
         {
             $lookup: {
-                from: "users",
+                from: "profiles",
                 localField: "author",
-                foreignField: "id",
+                foreignField: "userId",
                 as: "author"
             }
         },
         {
             $unwind: "$author"
-        },
-        {
-            $project: {
-                attachments: 1,
-                messageId: 1,
-                channelId: 1,
-                createdAt: 1,
-                body: 1,
-                "author.id": 1,
-                "author.username": 1,
-                "author.createdAt": 1
-            }
         },
         {
             $sort: {
