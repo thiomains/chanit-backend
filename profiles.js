@@ -41,4 +41,30 @@ async function updateProfilePictureUrl(userId, url) {
         })
 }
 
-module.exports = { getProfile, createProfile, updateProfilePictureUrl }
+async function updateUsername(userId, username) {
+    const database = await db.connectDatabase()
+    const profilesCollection = database.collection("profiles");
+    await profilesCollection.updateOne({
+            userId: userId
+        },
+        {
+            $set: {
+                username: username
+            }
+        })
+}
+
+async function updateBio(userId, bio) {
+    const database = await db.connectDatabase()
+    const profilesCollection = database.collection("profiles");
+    await profilesCollection.updateOne({
+            userId: userId
+        },
+        {
+            $set: {
+                bio: bio
+            }
+        })
+}
+
+module.exports = { getProfile, createProfile, updateProfilePictureUrl, updateBio, updateUsername }
