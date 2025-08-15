@@ -41,8 +41,6 @@ async function ws(ws, req) {
         message: "Successfully authenticated"
     }))
 
-    sendFriendsOnline(req.auth.user.id).then(() => {})
-
     const userId = req.auth.user.id
 
     if (!socketConnections.has(userId)) {
@@ -51,6 +49,8 @@ async function ws(ws, req) {
     }
     socketConnections.get(userId).add(ws)
     ws.userId = userId
+
+    sendFriendsOnline(req.auth.user.id).then(() => {})
 
     ws.on("close", () => {
         const set = socketConnections.get(ws.userId)
