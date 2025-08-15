@@ -86,7 +86,7 @@ function sendMessage(userId, message) {
 
 async function sendFriendsOnline(userId) {
     const friendList = await friends.getFriends(userId)
-    const online = new Set(socketConnections.keys().toArray())
+    const online = new Set(socketConnections.keys())
     if (!friendList) return
     if (friendList.length === 0) return
     for (friend of friendList) {
