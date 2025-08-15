@@ -41,6 +41,8 @@ async function ws(ws, req) {
         message: "Successfully authenticated"
     }))
 
+    sendFriendsOnline(req.auth.user.id).then(() => {})
+
     const userId = req.auth.user.id
 
     if (!socketConnections.has(userId)) {
@@ -79,6 +81,21 @@ function sendMessage(userId, message) {
     if (!connectionSet) return
     for (ws of connectionSet) {
         ws.send(msgString)
+    }
+}
+
+async function sendFriendsOnline(userId) {
+    const friendList = await friends.getFriends(userId)
+    const online = new Set(socketConnections.keys().toArray())
+    if (!friendList) return
+    if (friendList.length === 0) return
+    for (friend of friendList) {
+        if (!online.has(friend.user.userId)) continue
+        sendMessage(userId, {
+            type: "online-status",
+            userId: friend.user.userId,
+            status: "online"
+        })
     }
 }
 
