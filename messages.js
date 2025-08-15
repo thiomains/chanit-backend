@@ -10,13 +10,15 @@ async function createMessage(channelId, author, body, attachmentCount) {
             url: ""
         })
     }
+    let active = attachments.length === 0
     const message = {
         messageId: snowflake.generateId(),
         channelId: channelId,
         createdAt: Date.now(),
         author: author,
         body: body,
-        attachments: attachments
+        attachments: attachments,
+        active: active
     }
 
     await messagesCollection.insertOne(message)
@@ -32,7 +34,8 @@ async function getMessages(channelId, beforeTimestamp, limit) {
                 channelId: channelId,
                 createdAt: {
                     $lt: beforeTimestamp
-                }
+                },
+                active: true
             }
         },
         {
@@ -85,6 +88,7 @@ async function getMessage(messageId) {
                 channelId: 1,
                 createdAt: 1,
                 body: 1,
+                active: 1,
                 "author.id": 1,
                 "author.username": 1,
                 "author.createdAt": 1
@@ -107,4 +111,13 @@ async function setAttachment(messageId, index, attachment) {
     );
 }
 
-module.exports = { createMessage, getMessages, getMessage, setAttachment }
+async function setActive(messageId, active) {
+    const database = await db.connectDatabase()
+    const messagesCollection = database.collection("messages")
+    await messagesCollection.updateOne(
+        { messageId: messageId },
+        { $set: { active: active } }
+    );
+}
+
+module.exports = { createMessage, getMessages, getMessage, setAttachment, setActive }
