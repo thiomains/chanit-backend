@@ -47,6 +47,7 @@ async function post(req, res) {
         });
 
         const profile = await profiles.getProfile(userExists.id)
+        if (!userData.data.data.avatar) return
         if (profile.profilePictureUrl === "" || profile.profilePictureUrl.startsWith("https://cdn.faser.app/profile-pictures/")) await profiles.updateProfilePictureUrl(userExists.id, userData.data.data.avatar)
         return;
     }
@@ -74,6 +75,7 @@ async function post(req, res) {
         message: "Account created successfully"
     });
 
+    if (!userData.data.data.avatar) return
     await profiles.updateProfilePictureUrl(user.id, userData.data.data.avatar)
 }
 
