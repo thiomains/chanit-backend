@@ -87,7 +87,7 @@ async function post(req, res) {
     if (message.attachments.length !== attachmentIndex + 1) {
         return;
     }
-    messages.setActive(message.id, true)
+    await messages.setActive(message.messageId, true)
     message.attachments[attachmentIndex] = attachment
     currentChannel.sendToChannel(message.channelId, {
         type: "message",
