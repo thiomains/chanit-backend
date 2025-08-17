@@ -2,6 +2,7 @@ let channels = new Map()
 
 function setCurrentChannel(ws, channelId) {
     const oldChannelId = ws.currentChannelId
+    ws.currentChannelId = channelId
     if (!channels.get(channelId)) {
         channels.set(channelId, new Set())
     }
@@ -9,7 +10,6 @@ function setCurrentChannel(ws, channelId) {
 
     if (!oldChannelId) return
     channels.get(oldChannelId).delete(ws)
-    ws.currentChannelId = channelId
 }
 
 function getChannelConnections(channelId) {
