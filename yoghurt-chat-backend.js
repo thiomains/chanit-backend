@@ -18,6 +18,7 @@ app.use('/api/user/', authMiddleware)
 app.use('/api/channel/', authMiddleware)
 app.use('/api/message/', authMiddleware)
 app.use('/api/settings/', authMiddleware)
+app.use('/api/notifications/', authMiddleware)
 
 app.get('/', (req, res) => {
     res.send('helo');
@@ -50,6 +51,9 @@ app.delete('/api/message/:id/', require('./fileUpload').upload.single('attachmen
 app.post('/api/settings/profile/', require('./endpoints/settings/profile/profileUpdate').post)
 app.post('/api/settings/profile/avatar', require('./fileUpload').upload.single('avatar'), require('./endpoints/settings/profile/avatar').post)
 app.delete('/api/settings/profile/avatar', require('./fileUpload').upload.single('avatar'), require('./endpoints/settings/profile/avatar').remove)
+
+app.get('/api/notifications', require('./endpoints/notifications/notifications').get)
+app.delete('/api/notifications/:id', require('./endpoints/notifications/notifications').del)
 
 app.listen(process.env.PORT, () => {
     console.log("App listening on port " + process.env.PORT);

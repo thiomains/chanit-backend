@@ -3,6 +3,7 @@ const messages = require("../../messages")
 const {createMessage} = require("../../messages");
 const currentChannel = require("../../currentChannel")
 const users = require("../../users")
+const notifications = require("../../notifications")
 
 async function get(req, res) {
     const channelId = req.params.id;
@@ -54,6 +55,16 @@ async function post(req, res) {
         currentChannel.sendToChannel(channelId, {
             type: "message",
             message: message
+        })
+    }
+
+    for (user of channel.directMessageChannel.members) {
+        const userId = user.userId
+        if (userId === req.auth.user.id) continue
+        await notifications.createNotification(userId, "message", {
+            messageId: message.messageId,
+            channelId: message.channelId,
+            body: message.body.substring(0, 50)
         })
     }
 
