@@ -6,12 +6,16 @@ async function authMiddleware(req, res, next) {
     const sessionId = req.headers.session;
 
     if (!authHeader || !sessionId) {
-        res.status(401).send("Invalid or expired session");
+        res.status(401).send({
+            error: "Invalid or expired session"
+        });
         return;
     }
 
     if (!authHeader.startsWith("Bearer ")) {
-        res.status(401).send("Invalid or expired session");
+        res.status(401).send({
+            error: "Invalid or expired session"
+        });
         return;
     }
 
@@ -20,7 +24,9 @@ async function authMiddleware(req, res, next) {
     const user = await sessions.validateAccess(sessionId, token);
 
     if (user.length === 0) {
-        res.status(401).send("Invalid or expired session");
+        res.status(401).send({
+            error: "Invalid or expired session"
+        });
         return;
     }
 
