@@ -127,6 +127,9 @@ async function validateAccess(sessionId, accessToken) {
         return [];
     }
     const user = await usersCollection.findOne({id: session.userId});
+    if (!user) {
+        return [];
+    }
     if (!user.active) {
         return [];
     }

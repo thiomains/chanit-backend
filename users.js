@@ -85,6 +85,7 @@ async function createAccount(username, email, passwordHash, faserId) {
         password: passwordHash,
         createdAt: Date.now(),
         active: true,
+        emailVerified: false
     }
 
     if (faserId) {
@@ -113,4 +114,30 @@ async function getUserByFaser(faser) {
     return user
 }
 
-module.exports = { getPublicUser, getUserByName, getUserByEmail, createAccount, getUserByFaser, getUser };
+async function setUserActive(userId, active) {
+    const database = await db.connectDatabase();
+    const usersCollection = database.collection("users");
+    await usersCollection.updateOne({
+            id: userId
+        },
+        {
+            $set: {
+                active: active
+            }
+        })
+}
+
+async function setUserVerified(userId, verified) {
+    const database = await db.connectDatabase();
+    const usersCollection = database.collection("users");
+    await usersCollection.updateOne({
+            id: userId
+        },
+        {
+            $set: {
+                emailVerified: verified
+            }
+        })
+}
+
+module.exports = { getPublicUser, getUserByName, getUserByEmail, createAccount, getUserByFaser, getUser, setUserActive, setUserVerified };

@@ -3,6 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 const cookieParser = require('cookie-parser');
 const authMiddleware = require("./authMiddleware");
+const rateLimit = require("express-rate-limit");
 
 const app = express();
 app.use(cors({
@@ -13,7 +14,10 @@ app.use(cookieParser());
 app.use(express.json());
 const expressWs = require("express-ws")(app)
 
+app.use('/api/auth/verification-code/', rateLimit({windowMs: 1000*60*2, max: 1, message: {error:"You need to wait 120 seconds between requesting verification codes"} }))
+
 app.use('/api/auth/me', authMiddleware)
+app.use('/api/auth/verification-code/', authMiddleware)
 app.use('/api/user/', authMiddleware)
 app.use('/api/channel/', authMiddleware)
 app.use('/api/message/', authMiddleware)
@@ -32,6 +36,8 @@ app.post('/api/auth/login', require('./endpoints/auth/login'))
 app.post('/api/auth/logout', require('./endpoints/auth/logout'))
 app.post('/api/auth/session/refresh', require('./endpoints/auth/session/refresh'))
 app.get('/api/auth/me', require('./endpoints/auth/me'))
+app.post('/api/auth/verification-code/verify', require('./endpoints/auth/verification-code').verify)
+app.post('/api/auth/verification-code/', require('./endpoints/auth/verification-code').send)
 
 app.get('/api/user/:id', require('./endpoints/user/publicUser'))
 app.get('/api/user/:id/profile', require('./endpoints/user/profile').get)

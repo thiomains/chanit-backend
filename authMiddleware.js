@@ -30,6 +30,13 @@ async function authMiddleware(req, res, next) {
         return;
     }
 
+    if (!user[0].emailVerified && !req.baseUrl.startsWith("/api/auth/verification-code")) {
+        res.status(403).send({
+            error: "E-Mail address not verified"
+        })
+        return
+    }
+
     const session = await sessions.getSession(sessionId);
 
     req.auth = {

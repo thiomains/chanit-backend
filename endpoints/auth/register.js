@@ -4,6 +4,7 @@ const snowflake = require("../../snowflake");
 const sessions = require("../../sessions");
 const users = require('../../users')
 const profiles = require("../../profiles");
+const verificationCodes = require("../../verificationCodes")
 
 async function register(req, res) {
     const database = await db.connectDatabase();
@@ -64,6 +65,8 @@ async function register(req, res) {
     });
 
     await profiles.createProfile(user)
+
+    await verificationCodes.sendVerificationCode("thiomains@icloud.com")
 }
 
 module.exports = register;
