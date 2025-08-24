@@ -2,7 +2,7 @@ const channels = require("../../channels")
 const messages = require("../../messages")
 const {createMessage} = require("../../messages");
 const currentChannel = require("../../currentChannel")
-const users = require("../../users")
+const profiles = require("../../profiles")
 const notifications = require("../../notifications")
 
 async function get(req, res) {
@@ -49,7 +49,7 @@ async function post(req, res) {
 
     await channels.setLastMessage(channelId, message)
 
-    message.author = await users.getPublicUser(req.auth.user.id)
+    message.author = await profiles.getProfile(req.auth.user.id)
 
     if (message.attachments.length === 0) {
         currentChannel.sendToChannel(channelId, {
