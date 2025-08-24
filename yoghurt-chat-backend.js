@@ -14,6 +14,8 @@ app.use(cookieParser());
 app.use(express.json());
 const expressWs = require("express-ws")(app)
 
+app.set('trust proxy', 1)
+
 app.use('/api/auth/me', authMiddleware)
 app.use('/api/auth/verification-code/', authMiddleware)
 app.use('/api/user/', authMiddleware)
