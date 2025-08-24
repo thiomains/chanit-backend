@@ -9,6 +9,7 @@ async function sendEmail(receiver, content, subject) {
             user: process.env.MAIL_USERNAME,
             pass: process.env.MAIL_PASSWORD,
         },
+        validate: {xForwardedForHeader: false}
     });
 
     await (async () => {
