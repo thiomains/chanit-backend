@@ -32,7 +32,7 @@ async function post(req, res) {
 
     const key = "/" + userId + "/" + avatarId + ".jpg"
 
-    const url = "https://cdn.minescope.eu/avatars" + key.replaceAll(" ", "%20")
+    const url = "https://cdn.faser.app/chanit/avatars" + key.replaceAll(" ", "%20")
 
     const params = {
         Bucket: "avatars",
