@@ -76,7 +76,7 @@ async function post(req, res) {
     })
 
     const params = {
-        Bucket: "attachments",
+        Bucket: process.env.S3_ATTACHMENTS_BUCKET,
         Key: key,
         Body: req.file.buffer,
         ContentType: req.file.mimetype,

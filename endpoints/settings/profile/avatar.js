@@ -35,7 +35,7 @@ async function post(req, res) {
     const url = "https://cdn.faser.app/chanit/avatars" + key.replaceAll(" ", "%20")
 
     const params = {
-        Bucket: "avatars",
+        Bucket: process.env.S3_AVATARS_BUCKET,
         Key: key,
         Body: processedBuffer,
         ContentType: req.file.mimetype,
