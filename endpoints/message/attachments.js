@@ -3,6 +3,7 @@ const snowflake = require("../../snowflake")
 
 const AWS = require('aws-sdk');
 const currentChannel = require("../../currentChannel");
+const profiles = require("../../profiles");
 const s3 = new AWS.S3({
     endpoint: process.env.S3_SERVER,
     accessKeyId: process.env.S3_ACCESS_KEY,
@@ -89,6 +90,7 @@ async function post(req, res) {
     }
     await messages.setActive(message.messageId, true)
     message.attachments[attachmentIndex] = attachment
+    message.author = await profiles.getProfile(req.auth.user.id)
     currentChannel.sendToChannel(message.channelId, {
         type: "message",
         message: message
