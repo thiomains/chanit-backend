@@ -59,7 +59,7 @@ async function post(req, res) {
 
     const key = message.channelId + "/" + message.messageId + "/" + attachmentId + "/" + req.file.originalname
 
-    const url = "https://cdn.faser.app/chanit/attachments/" + key.replaceAll(" ", "%20")
+    const url = "https://cdn.faser.app/chanit/" + process.env.S3_ATTACHMENTS_BUCKET + "/" + key.replaceAll(" ", "%20")
 
     const attachment = {
         url: url,
