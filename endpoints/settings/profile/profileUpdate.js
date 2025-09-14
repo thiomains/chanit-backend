@@ -10,7 +10,15 @@ async function post(req, res) {
         })
         return
     }
-    if (newBio) await profiles.updateBio(userId, newBio)
+    if (newBio) {
+        if (newBio.length > 400) {
+            res.status(400).send({
+                error: "Bio can only be 400 characters long"
+            })
+            return
+        }
+        await profiles.updateBio(userId, newBio)
+    }
     if (newUsername) {
         await profiles.updateUsername(userId, newUsername)
     }
