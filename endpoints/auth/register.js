@@ -18,7 +18,7 @@ async function register(req, res) {
     }
 
     const lowercaseUsername = req.body.username.toLowerCase()
-    const usernameRegex = /^[a-z][0-9,a-z_.-]{2,23}$/
+    const usernameRegex = /^[a-z][0-9a-z_.-]{2,23}$/
     if (!lowercaseUsername.test(usernameRegex)) {
         res.status(400).send({
             error: "Username must be 3–24 characters long, start with a letter, and may contain letters, numbers, dots (.), dashes (-), and underscores (_)."
