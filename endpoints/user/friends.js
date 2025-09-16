@@ -18,7 +18,7 @@ async function post(req, res) {
 
     let userId = req.params.id
 
-    if (userId.length <= 16) {
+    if (userId.test(/^[a-z]/)) {
         const user = await users.getUserByName(userId)
         if (!user) {
             res.status(404).send({
@@ -27,6 +27,14 @@ async function post(req, res) {
             return;
         }
         userId = user.id
+    } else {
+        const user = await users.getUserById(userId)
+        if (!user) {
+            res.status(404).send({
+                error: "User not found"
+            })
+            return;
+        }
     }
 
     if (userId === req.auth.user.id) {
