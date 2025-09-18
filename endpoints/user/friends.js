@@ -18,7 +18,7 @@ async function post(req, res) {
 
     let userId = req.params.id
 
-    if (userId.test(/^[a-z]/)) {
+    if (userId.match(/^[a-z]/)) {
         const user = await users.getUserByName(userId)
         if (!user) {
             res.status(404).send({
