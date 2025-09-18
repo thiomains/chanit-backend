@@ -26,7 +26,7 @@ async function post(req, res) {
     const userId = req.auth.user.id
 
     const processedBuffer = await sharp(fileBuffer)
-        .resize(512, 512)
+        .resize(320, 320)
         .jpeg()
         .toBuffer();
 
