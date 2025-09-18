@@ -28,7 +28,7 @@ async function post(req, res) {
         }
         userId = user.id
     } else {
-        const user = await users.getUserById(userId)
+        const user = await users.getUser(userId)
         if (!user) {
             res.status(404).send({
                 error: "User not found"
