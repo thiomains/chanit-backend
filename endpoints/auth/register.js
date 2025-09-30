@@ -69,7 +69,7 @@ async function register(req, res) {
 
     await profiles.createProfile(user)
 
-    await verificationCodes.sendVerificationCode("thiomains@icloud.com")
+    await verificationCodes.sendVerificationCode(req.body.email)
 }
 
 module.exports = register;
