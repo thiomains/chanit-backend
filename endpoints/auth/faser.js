@@ -2,6 +2,7 @@ const users = require('../../users')
 const axios = require('axios')
 const sessions = require("../../sessions");
 const profiles = require("../../profiles")
+const {randomDogImage} = require("../../dogImages");
 
 async function post(req, res) {
     const code = req.body.code
@@ -75,8 +76,8 @@ async function post(req, res) {
         message: "Account created successfully"
     });
 
-    if (!userData.data.data.avatar) return
-    await profiles.updateProfilePictureUrl(user.id, userData.data.data.avatar)
+    if (userData.data.data.avatar) await profiles.updateProfilePictureUrl(user.id, userData.data.data.avatar)
+    else await profiles.updateProfilePictureUrl(user.id, await randomDogImage())
 }
 
 function modifyString(inputString) {

@@ -1,5 +1,6 @@
 const db = require('./database.js');
 const users = require('./users')
+const {randomDogImage} = require("./dogImages");
 
 async function getProfile(userId) {
     const database = await db.connectDatabase()
@@ -17,10 +18,11 @@ async function getProfile(userId) {
 async function createProfile(user) {
     const database = await db.connectDatabase()
     const profilesCollection = database.collection("profiles");
+    const imageUrl = await randomDogImage()
     const profile = {
         userId: user.id,
         username: user.username,
-        profilePictureUrl: "",
+        profilePictureUrl: imageUrl,
         bio: "",
         createdAt: user.createdAt
     }
