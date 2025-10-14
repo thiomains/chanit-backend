@@ -34,15 +34,10 @@ async function isValid(address, code) {
     if (!document) return false
     if (document.used) return false
     if (document.expiresAt < Date.now()) return false
-    await codesCollection.updateOne({
-            emailAddress: address,
-            code: code
-        },
-        {
-            $set: {
-                used: true
-            }
-        })
+    await codesCollection.deleteOne({
+        emailAddress: address,
+        code: code,
+    })
 
     return true
 }
