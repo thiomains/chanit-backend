@@ -24,7 +24,7 @@ app.use('/api/channel/', authMiddleware)
 app.use('/api/message/', authMiddleware)
 app.use('/api/settings/', authMiddleware)
 app.use('/api/notifications/', authMiddleware)
-app.use('/api/admin/users/', authMiddleware)
+app.use('/api/admin/', authMiddleware)
 
 app.get('/', (req, res) => {
     res.send('helo');
@@ -64,6 +64,7 @@ app.get('/api/notifications', require('./endpoints/notifications/notifications')
 app.delete('/api/notifications/:id', require('./endpoints/notifications/notifications').del)
 
 app.get('/api/admin/users', globalPermissionsMiddleware(["adminAccess", "viewUserInformation"]), require('./endpoints/admin/users').get)
+app.get('/api/admin/me', globalPermissionsMiddleware(["adminAccess"]), require('./endpoints/admin/me').get)
 
 app.listen(process.env.PORT, () => {
     console.log("App listening on port " + process.env.PORT);
