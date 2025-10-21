@@ -140,4 +140,12 @@ async function setUserVerified(userId, verified) {
         })
 }
 
-module.exports = { getPublicUser, getUserByName, getUserByEmail, createAccount, getUserByFaser, getUser, setUserActive, setUserVerified };
+async function getAllUsers() {
+    const database = await db.connectDatabase();
+    const usersCollection = database.collection("users");
+
+    const usersDocument = await usersCollection.find({}, { projection: { password: 0, _id: 0 } });
+    return await usersDocument.toArray();
+}
+
+module.exports = { getPublicUser, getUserByName, getUserByEmail, createAccount, getUserByFaser, getUser, setUserActive, setUserVerified, getAllUsers };
