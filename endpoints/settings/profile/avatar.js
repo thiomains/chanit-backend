@@ -30,9 +30,9 @@ async function post(req, res) {
         .jpeg()
         .toBuffer();
 
-    const key = "/" + userId + "/" + avatarId + ".jpg"
+    const key = userId + "/" + avatarId + ".jpg"
 
-    const url = "https://cdn.faser.app/chanit/" + process.env.S3_AVATARS_BUCKET + key.replaceAll(" ", "%20")
+    const url = "https://cdn.faser.app/chanit/" + process.env.S3_AVATARS_BUCKET + "/" + key.replaceAll(" ", "%20")
 
     const params = {
         Bucket: process.env.S3_AVATARS_BUCKET,
