@@ -4,8 +4,6 @@ const currentChannel = require("../../currentChannel")
 async function del(req, res) {
     const message = await messages.getMessage(req.params.id)
 
-    console.log(message)
-
     if (!message) {
         res.status(404).send({
             error: 'Message not found'
