@@ -132,4 +132,12 @@ async function editMessageBody(messageId, body) {
     );
 }
 
-module.exports = { createMessage, getMessages, getMessage, setAttachment, setActive, editMessageBody }
+async function getUserMessages(userId) {
+    const database = await db.connectDatabase()
+    const messagesCollection = database.collection("messages")
+    return await messagesCollection.find({
+        author: userId
+    }).toArray()
+}
+
+module.exports = { createMessage, getMessages, getMessage, setAttachment, setActive, editMessageBody, getUserMessages }

@@ -61,6 +61,8 @@ app.post('/api/settings/profile/', require('./endpoints/settings/profile/profile
 app.post('/api/settings/profile/avatar', require('./fileUpload').upload.single('avatar'), require('./endpoints/settings/profile/avatar').post)
 app.delete('/api/settings/profile/avatar', require('./fileUpload').upload.single('avatar'), require('./endpoints/settings/profile/avatar').remove)
 
+app.post('/api/settings/data/', require('./endpoints/settings/data/request').post)
+
 app.get('/api/notifications', require('./endpoints/notifications/notifications').get)
 app.delete('/api/notifications/:id', require('./endpoints/notifications/notifications').del)
 

@@ -1,6 +1,7 @@
 const db = require('./database')
 const snowflake = require('./snowflake')
 const mailSender = require("./mailSender")
+const users = require("./users")
 
 async function sendVerificationCode(address) {
     const database = await db.connectDatabase();
@@ -42,4 +43,14 @@ async function isValid(address, code) {
     return true
 }
 
-module.exports = { sendVerificationCode, isValid }
+async function getUserCodes(userId) {
+    const user = await users.getUser(userId)
+    const email = user.email
+    const database = await db.connectDatabase();
+    const codesCollection = database.collection("verificationCodes");
+    return await codesCollection.find({
+        emailAddress: email
+    }).toArray()
+}
+
+module.exports = { sendVerificationCode, isValid, getUserCodes }
