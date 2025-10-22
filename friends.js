@@ -20,7 +20,7 @@ async function getFriendships(userId) {
 async function getFriends(userId) {
     const database = await db.connectDatabase();
     const friendsCollection = database.collection("friends");
-    const friends = await (await (await friendsCollection.aggregate([
+    const friends = await friendsCollection.aggregate([
         {
             $match: {
                 users: userId
@@ -44,28 +44,22 @@ async function getFriends(userId) {
         },
         {
             $lookup: {
-                from: "users",
-                localField: "friendId",
-                foreignField: "id",
-                as: "friend"
+                from: "profiles",            // statt "users"
+                localField: "friendId",      // ID aus dem aktuellen Dokument
+                foreignField: "userId",      // Feld in profiles mit userId
+                as: "profile"
             }
         },
-        {
-            $unwind: "$friend"
-        },
+        { $unwind: "$profile" },
         {
             $project: {
                 _id: 0,
                 friendsSince: 1,
                 directChannelId: 1,
-                user: {
-                    userId: "$friend.id",
-                    username: "$friend.username",
-                    createdAt: "$friend.createdAt"
-                }
+                user: "$profile"             // direkt das Profil-Dokument einsetzen
             }
         }
-    ])).toArray());
+    ]).toArray();
 
     return friends
 }
