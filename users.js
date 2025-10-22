@@ -144,8 +144,33 @@ async function getAllUsers() {
     const database = await db.connectDatabase();
     const usersCollection = database.collection("users");
 
-    const usersDocument = await usersCollection.find({}, { projection: { password: 0, _id: 0 } });
-    return await usersDocument.toArray();
+    const result = await usersCollection
+        .aggregate([
+            {
+                $lookup: {
+                    from: "profiles",
+                    localField: "id",
+                    foreignField: "userId",
+                    as: "profile"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$profile",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    password: 0,
+                    _id: 0
+                }
+            }
+        ])
+        .toArray();
+
+    return result;
+
 }
 
 module.exports = { getPublicUser, getUserByName, getUserByEmail, createAccount, getUserByFaser, getUser, setUserActive, setUserVerified, getAllUsers };
