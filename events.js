@@ -41,6 +41,12 @@ async function ws(ws, req) {
         message: "Successfully authenticated"
     }))
 
+    setInterval(() => {
+        ws.send(JSON.stringify({
+            type: "ping"
+        }))
+    }, 10000)
+
     const userId = req.auth.user.id
 
     if (!socketConnections.has(userId)) {
