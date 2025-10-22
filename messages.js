@@ -120,4 +120,13 @@ async function setActive(messageId, active) {
     );
 }
 
-module.exports = { createMessage, getMessages, getMessage, setAttachment, setActive }
+async function editMessageBody(messageId, body) {
+    const database = await db.connectDatabase()
+    const messagesCollection = database.collection("messages")
+    await messagesCollection.updateOne(
+        { messageId: messageId },
+        { $set: { body: body } }
+    );
+}
+
+module.exports = { createMessage, getMessages, getMessage, setAttachment, setActive, editMessageBody }
