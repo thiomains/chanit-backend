@@ -10,6 +10,7 @@ function globalPermissionsMiddleware(requiredPermissions) {
             res.status(403).send({
                 error: "Forbidden"
             })
+            return
         }
         const userPermsArray = Object.keys(userPerms);
         const hasAllPermissions = requiredPermissions.every(perm => userPermsArray.includes(perm));
