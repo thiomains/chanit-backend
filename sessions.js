@@ -95,6 +95,15 @@ async function getSession(sessionId) {
     return await sessionsCollection.findOne({sessionId: sessionId});
 }
 
+async function getSessions(userId) {
+    const database = await db.connectDatabase();
+    const sessionsCollection = database.collection("sessions");
+    return await sessionsCollection.find(
+        { userId: userId },
+        { projection: { refreshToken: 0, accessToken: 0, accessTokenExpiresAt: 0 } }
+    ).toArray();
+}
+
 function isSessionValid(session) {
     if (!session) {
         return false;
@@ -137,4 +146,4 @@ async function validateAccess(sessionId, accessToken) {
 
 }
 
-module.exports = {createSession, refreshToken, setSessionCookieAndSend, invalidateSessionById, getSession, isSessionValid, isAccessTokenValid, validateAccess};
+module.exports = {createSession, refreshToken, setSessionCookieAndSend, invalidateSessionById, getSession, isSessionValid, isAccessTokenValid, validateAccess, getSessions};
