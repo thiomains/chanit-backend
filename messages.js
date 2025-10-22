@@ -125,7 +125,10 @@ async function editMessageBody(messageId, body) {
     const messagesCollection = database.collection("messages")
     await messagesCollection.updateOne(
         { messageId: messageId },
-        { $set: { body: body } }
+        { $set: {
+            body: body,
+            lastEdited: Date.now()
+        } }
     );
 }
 

@@ -45,7 +45,8 @@ async function patch(req, res) {
     currentChannel.sendToChannel(message.channelId, {
         type: "message-edit",
         messageId: message.messageId,
-        body: req.body.body
+        body: req.body.body,
+        lastEdited: Date.now()
     })
 }
 
