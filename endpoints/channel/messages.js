@@ -48,6 +48,16 @@ async function post(req, res) {
     }
     if (!attachments) attachments = 0
 
+    let messageBody = req.body.body
+    messageBody = messageBody.trim()
+    if (messageBody === "") {
+        if (attachments === 0) {
+            return res.status(400).send({
+                error: "Messages without attached files cannot be empty"
+            })
+        }
+    }
+
     const message = await messages.createMessage(channelId, req.auth.user.id, req.body.body, attachments)
 
     res.status(201).send(message)
