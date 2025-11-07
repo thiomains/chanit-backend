@@ -41,6 +41,11 @@ async function post(req, res) {
     }
 
     let attachments = req.body.attachmentCount
+    if (attachments > 9) {
+        return res.status(400).send({
+            error: "You cannot attach more than 9 files to a single message"
+        })
+    }
     if (!attachments) attachments = 0
 
     const message = await messages.createMessage(channelId, req.auth.user.id, req.body.body, attachments)
