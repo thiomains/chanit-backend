@@ -26,15 +26,18 @@ async function register(req, res) {
         return;
     }
 
+    let email = req.body.email
+    email = email.toLowerCase()
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!req.body.email.match(emailRegex)) {
+    if (!email.match(emailRegex)) {
         res.status(400).send({
             error: "Invalid email address"
         })
         return;
     }
 
-    const checkIfEmailIsTaken = await users.getUserByEmail(req.body.email)
+    const checkIfEmailIsTaken = await users.getUserByEmail(email)
     if (checkIfEmailIsTaken) {
         res.status(409).send({
             error: "Email is already taken"
@@ -42,7 +45,7 @@ async function register(req, res) {
         return;
     }
 
-    const checkIfUsernameIsTaken = await users.getUserByName(req.body.username)
+    const checkIfUsernameIsTaken = await users.getUserByName(lowercaseUsername)
     if (checkIfUsernameIsTaken) {
         res.status(409).send({
             error: "Username is already taken"
@@ -60,7 +63,7 @@ async function register(req, res) {
 
     const passwordHash = await bcrypt.hash(req.body.password, 10);
 
-    const user = await users.createAccount(req.body.username, req.body.email, passwordHash)
+    const user = await users.createAccount(lowercaseUsername, email, passwordHash)
 
     const session = await sessions.createSession(user.id, req.headers["user-agent"], req.ip);
     sessions.setSessionCookieAndSend(res, session, 201, {
@@ -69,7 +72,7 @@ async function register(req, res) {
 
     await profiles.createProfile(user)
 
-    await verificationCodes.sendVerificationCode(req.body.email)
+    await verificationCodes.sendVerificationCode(email)
 }
 
 module.exports = register;
