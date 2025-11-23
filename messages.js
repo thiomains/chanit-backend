@@ -25,6 +25,31 @@ async function createMessage(channelId, author, body, attachmentCount) {
     return message
 }
 
+async function createMessage(channelId, author, body, attachmentCount, embeds) {
+    const database = await db.connectDatabase();
+    const messagesCollection = database.collection("messages");
+    let attachments = []
+    for (let i = 0; i < attachmentCount; i++) {
+        attachments.push({
+            url: ""
+        })
+    }
+    let active = attachments.length === 0
+    const message = {
+        messageId: snowflake.generateId(),
+        channelId: channelId,
+        createdAt: Date.now(),
+        author: author,
+        body: body,
+        attachments: attachments,
+        active: active,
+        embeds: embeds
+    }
+
+    await messagesCollection.insertOne(message)
+    return message
+}
+
 async function getMessages(channelId, beforeTimestamp, limit) {
     const database = await db.connectDatabase()
     const messagesCollection = database.collection("messages")

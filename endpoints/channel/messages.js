@@ -5,6 +5,8 @@ const currentChannel = require("../../currentChannel")
 const profiles = require("../../profiles")
 const notifications = require("../../notifications")
 
+const axios = require("axios")
+
 async function get(req, res) {
     const channelId = req.params.id;
     const channel = await channels.getChannel(channelId)
@@ -58,7 +60,18 @@ async function post(req, res) {
         }
     }
 
-    const message = await messages.createMessage(channelId, req.auth.user.id, req.body.body, attachments)
+    let urlsInBody = messageBody.match(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g)
+    let embeds = []
+    if (urlsInBody) {
+        for (const url of urlsInBody) {
+            const embed = await axios.post("https://embeds.faser.app/embed", {
+                url: url
+            })
+            embeds.push(embed.data)
+        }
+    }
+
+    const message = await messages.createMessage(channelId, req.auth.user.id, req.body.body, attachments, embeds)
 
     res.status(201).send(message)
 
