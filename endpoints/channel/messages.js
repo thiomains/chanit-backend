@@ -69,6 +69,11 @@ async function post(req, res) {
                 const embed = await axios.post("https://embeds.faser.app/embed", {
                     url: urlsInBody[urlIndex]
                 })
+                let embedAlreadyExists
+                for (embedIndex of embeds) {
+                    if (embeds[i] === embed) embedAlreadyExists = true
+                }
+                if (embedAlreadyExists) continue
                 embeds.push(embed.data)
             } catch (e) {
                 console.log(e)
