@@ -63,11 +63,16 @@ async function post(req, res) {
     let urlsInBody = messageBody.match(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g)
     let embeds = []
     if (urlsInBody) {
-        for (const url of urlsInBody) {
-            const embed = await axios.post("https://embeds.faser.app/embed", {
-                url: url
-            })
-            embeds.push(embed.data)
+        for (const urlIndex in urlsInBody) {
+            if (urlIndex >= 3) break
+            try {
+                const embed = await axios.post("https://embeds.faser.app/embed", {
+                    url: urlsInBody[urlIndex]
+                })
+                embeds.push(embed.data)
+            } catch (e) {
+                console.log(e)
+            }
         }
     }
 
