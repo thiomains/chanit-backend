@@ -81,13 +81,36 @@ async function post(req, res) {
         }
     }
 
-    const message = await messages.createMessage(channelId, req.auth.user.id, req.body.body, attachments, embeds)
+    let replyTo = req.body.replyTo
+    if (replyTo) {
+        // Validate parent message exists, is active, and is in the same channel
+        const parentMessage = await messages.getMessage(replyTo)
+        if (!parentMessage) {
+            res.status(400).send({ error: "Parent message not found" })
+            return
+        }
+        if (!parentMessage.active) {
+            res.status(400).send({ error: "Cannot reply to a deleted message" })
+            return
+        }
+        if (parentMessage.channelId !== channelId) {
+            res.status(400).send({ error: "Cannot reply across channels" })
+            return
+        }
+    }
+
+    const message = await messages.createMessage(channelId, req.auth.user.id, req.body.body, attachments, embeds, replyTo)
 
     res.status(201).send(message)
 
     await channels.setLastMessage(channelId, message)
 
     message.author = await profiles.getProfile(req.auth.user.id)
+
+    // Increment reply count on parent message
+    if (replyTo) {
+        await messages.incrementReplyCount(replyTo)
+    }
 
     if (message.attachments.length === 0) {
         currentChannel.sendToChannel(channelId, {

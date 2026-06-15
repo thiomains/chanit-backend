@@ -54,6 +54,7 @@ app.get('/api/channel/:id/messages', require('./endpoints/channel/messages').get
 app.post('/api/channel/:id/messages', require('./endpoints/channel/messages').post)
 
 app.post('/api/message/:id/attachments', require('./fileUpload').upload.single('attachment'), require('./endpoints/message/attachments').post)
+app.get('/api/message/:id/replies', require('./endpoints/message/replies').get)
 app.delete('/api/message/:id/', require('./endpoints/message/delete').del)
 app.patch('/api/message/:id/', require('./endpoints/message/patch').patch)
 

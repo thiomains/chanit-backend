@@ -1,31 +1,7 @@
 const db = require('./database')
 const snowflake = require('./snowflake')
 
-async function createMessage(channelId, author, body, attachmentCount) {
-    const database = await db.connectDatabase();
-    const messagesCollection = database.collection("messages");
-    let attachments = []
-    for (let i = 0; i < attachmentCount; i++) {
-        attachments.push({
-            url: ""
-        })
-    }
-    let active = attachments.length === 0
-    const message = {
-        messageId: snowflake.generateId(),
-        channelId: channelId,
-        createdAt: Date.now(),
-        author: author,
-        body: body,
-        attachments: attachments,
-        active: active
-    }
-
-    await messagesCollection.insertOne(message)
-    return message
-}
-
-async function createMessage(channelId, author, body, attachmentCount, embeds) {
+async function createMessage(channelId, author, body, attachmentCount, embeds, replyTo) {
     const database = await db.connectDatabase();
     const messagesCollection = database.collection("messages");
     let attachments = []
@@ -43,8 +19,9 @@ async function createMessage(channelId, author, body, attachmentCount, embeds) {
         body: body,
         attachments: attachments,
         active: active,
-        embeds: embeds
+        replyTo: replyTo || null
     }
+    if (embeds) message.embeds = embeds
 
     await messagesCollection.insertOne(message)
     return message
@@ -114,6 +91,10 @@ async function getMessage(messageId) {
                 createdAt: 1,
                 body: 1,
                 active: 1,
+                embeds: 1,
+                lastEdited: 1,
+                replyTo: 1,
+                replyCount: 1,
                 "author.id": 1,
                 "author.username": 1,
                 "author.createdAt": 1
@@ -165,4 +146,47 @@ async function getUserMessages(userId) {
     }).toArray()
 }
 
-module.exports = { createMessage, getMessages, getMessage, setAttachment, setActive, editMessageBody, getUserMessages }
+async function getReplyChain(messageId) {
+    const database = await db.connectDatabase()
+    const messagesCollection = database.collection("messages")
+
+    // Step 1: Walk up the chain to find the root message (replyTo === null)
+    let rootId = messageId
+    while (true) {
+        const msg = await messagesCollection.findOne({ messageId: rootId })
+        if (!msg || !msg.replyTo) break
+        rootId = msg.replyTo
+    }
+
+    // Step 2: Walk down from root, collecting all messages in the flat chain
+    const chain = []
+    let currentId = rootId
+    while (true) {
+        const results = await messagesCollection.aggregate([
+            { $match: { messageId: currentId, active: true } },
+            { $lookup: { from: "profiles", localField: "author", foreignField: "userId", as: "author" } },
+            { $unwind: "$author" }
+        ]).toArray()
+
+        if (!results || results.length === 0) break
+        chain.push(results[0])
+
+        // Find the next message in the chain (one that has replyTo = currentId)
+        const next = await messagesCollection.findOne({ replyTo: currentId, active: true })
+        if (!next) break
+        currentId = next.messageId
+    }
+
+    return chain
+}
+
+async function incrementReplyCount(messageId) {
+    const database = await db.connectDatabase()
+    const messagesCollection = database.collection("messages")
+    await messagesCollection.updateOne(
+        { messageId: messageId },
+        { $inc: { replyCount: 1 } }
+    )
+}
+
+module.exports = { createMessage, getMessages, getMessage, setAttachment, setActive, editMessageBody, getUserMessages, getReplyChain, incrementReplyCount }
