@@ -8,6 +8,7 @@
 - **IDs:** All primary keys are Snowflake-style strings from `snowflake.generateId()`, not ObjectId.
 - **No build step, no TypeScript, no linter, no test framework.**
 - **Start:** `node yoghurt-chat-backend.js` (needs `.env` — see below).
+- **Dev mode:** Set `DEV_MODE=true` in `.env` to skip password strength validation on registration. Never use in production.
 - **Docs:** `docs/` contains authoritative API, auth, architecture, DB schema, deployment, and WebSocket documentation. Read them before working on a domain.
 
 ## Environment (.env)
@@ -153,7 +154,7 @@ const collection = database.collection("collectionName");
 
 ## Email
 
-- `mailSender.js` is a Nodemailer wrapper. From address is hardcoded to `chanit-noreply@thimocolditz.de`.
+- `mailSender.js` is a Nodemailer wrapper. From address uses `process.env.MAIL_USERNAME`.
 
 ## Rate limiting
 
