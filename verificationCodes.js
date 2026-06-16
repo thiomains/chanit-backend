@@ -53,4 +53,42 @@ async function getUserCodes(userId) {
     }).toArray()
 }
 
-module.exports = { sendVerificationCode, isValid, getUserCodes }
+async function sendEmailChangeCode(emailAddress, newEmail) {
+    const database = await db.connectDatabase();
+    const codesCollection = database.collection("verificationCodes");
+    const code = generateVerificationCode();
+    const verificationCode = {
+        emailAddress: emailAddress,
+        expiresAt: Date.now() + 1000 * 60 * 5,
+        code: code,
+        used: false,
+        newEmail: newEmail || null
+    };
+    await codesCollection.insertOne(verificationCode);
+    await mailSender.sendEmail(emailAddress, code + " is your Chanit verification code", code + " is your Chanit verification code");
+    return code;
+}
+
+async function getCodeDocument(emailAddress, code) {
+    const database = await db.connectDatabase();
+    const codesCollection = database.collection("verificationCodes");
+    const doc = await codesCollection.findOne({ emailAddress, code });
+    if (!doc) return null;
+    if (doc.used) return null;
+    if (doc.expiresAt < Date.now()) return null;
+    return doc;
+}
+
+async function consumeCode(emailAddress, code) {
+    const database = await db.connectDatabase();
+    const codesCollection = database.collection("verificationCodes");
+    await codesCollection.deleteOne({ emailAddress, code });
+}
+
+async function deleteUserCodes(email) {
+    const database = await db.connectDatabase();
+    const codesCollection = database.collection("verificationCodes");
+    await codesCollection.deleteMany({ emailAddress: email });
+}
+
+module.exports = { sendVerificationCode, isValid, getUserCodes, sendEmailChangeCode, getCodeDocument, consumeCode, deleteUserCodes }

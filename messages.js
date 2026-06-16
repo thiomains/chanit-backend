@@ -189,4 +189,19 @@ async function incrementReplyCount(messageId) {
     )
 }
 
-module.exports = { createMessage, getMessages, getMessage, setAttachment, setActive, editMessageBody, getUserMessages, getReplyChain, incrementReplyCount }
+async function getAllUserMessagesWithAttachments(userId) {
+    const database = await db.connectDatabase();
+    const messagesCollection = database.collection("messages");
+    return await messagesCollection.find({
+        author: userId,
+        "attachments.url": { $ne: "" }
+    }).project({ attachments: 1, channelId: 1, messageId: 1 }).toArray();
+}
+
+async function deleteAllUserMessages(userId) {
+    const database = await db.connectDatabase();
+    const messagesCollection = database.collection("messages");
+    await messagesCollection.deleteMany({ author: userId });
+}
+
+module.exports = { createMessage, getMessages, getMessage, setAttachment, setActive, editMessageBody, getUserMessages, getReplyChain, incrementReplyCount, getAllUserMessagesWithAttachments, deleteAllUserMessages }

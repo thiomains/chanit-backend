@@ -173,4 +173,22 @@ async function getAllUsers() {
 
 }
 
-module.exports = { getPublicUser, getUserByName, getUserByEmail, createAccount, getUserByFaser, getUser, setUserActive, setUserVerified, getAllUsers };
+async function updatePassword(userId, passwordHash) {
+    const database = await db.connectDatabase();
+    const usersCollection = database.collection("users");
+    await usersCollection.updateOne({ id: userId }, { $set: { password: passwordHash } });
+}
+
+async function updateEmail(userId, newEmail) {
+    const database = await db.connectDatabase();
+    const usersCollection = database.collection("users");
+    await usersCollection.updateOne({ id: userId }, { $set: { email: newEmail } });
+}
+
+async function deleteUser(userId) {
+    const database = await db.connectDatabase();
+    const usersCollection = database.collection("users");
+    await usersCollection.deleteOne({ id: userId });
+}
+
+module.exports = { getPublicUser, getUserByName, getUserByEmail, createAccount, getUserByFaser, getUser, setUserActive, setUserVerified, getAllUsers, updatePassword, updateEmail, deleteUser };

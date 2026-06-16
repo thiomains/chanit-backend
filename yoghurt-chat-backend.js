@@ -64,6 +64,15 @@ app.delete('/api/settings/profile/avatar', require('./fileUpload').upload.single
 
 app.post('/api/settings/data/', require('./endpoints/settings/data/request').post)
 
+app.post('/api/settings/password', require('./endpoints/settings/password/change'))
+
+app.post('/api/settings/email/request', require('./endpoints/settings/email/request'))
+app.post('/api/settings/email/verify-old', require('./endpoints/settings/email/verify-old'))
+app.post('/api/settings/email/verify-new', require('./endpoints/settings/email/verify-new'))
+
+app.post('/api/settings/delete/request', require('./endpoints/settings/delete').request)
+app.post('/api/settings/delete', require('./endpoints/settings/delete').confirm)
+
 app.get('/api/notifications', require('./endpoints/notifications/notifications').get)
 app.delete('/api/notifications/:id', require('./endpoints/notifications/notifications').del)
 
