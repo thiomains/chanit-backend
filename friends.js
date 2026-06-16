@@ -76,17 +76,17 @@ async function getIncomingFriendRequests(userId) {
         },
         {
             $lookup: {
-                from: "users",
+                from: "profiles",
                 localField: "recipient",
-                foreignField: "id",
+                foreignField: "userId",
                 as: "recipientUser"
             }
         },
         {
             $lookup: {
-                from: "users",
+                from: "profiles",
                 localField: "sender",
-                foreignField: "id",
+                foreignField: "userId",
                 as: "senderUser"
             }
         },
@@ -97,13 +97,17 @@ async function getIncomingFriendRequests(userId) {
                 _id: 0,
                 createdAt: 1,
                 recipient: {
-                    userId: "$recipientUser.id",
+                    userId: "$recipientUser.userId",
                     username: "$recipientUser.username",
+                    profilePictureUrl: "$recipientUser.profilePictureUrl",
+                    bio: "$recipientUser.bio",
                     createdAt: "$recipientUser.createdAt"
                 },
                 sender: {
-                    userId: "$senderUser.id",
+                    userId: "$senderUser.userId",
                     username: "$senderUser.username",
+                    profilePictureUrl: "$senderUser.profilePictureUrl",
+                    bio: "$senderUser.bio",
                     createdAt: "$senderUser.createdAt"
                 }
             }
@@ -124,17 +128,17 @@ async function getOutgoingFriendRequests(userId) {
         },
         {
             $lookup: {
-                from: "users",
+                from: "profiles",
                 localField: "recipient",
-                foreignField: "id",
+                foreignField: "userId",
                 as: "recipientUser"
             }
         },
         {
             $lookup: {
-                from: "users",
+                from: "profiles",
                 localField: "sender",
-                foreignField: "id",
+                foreignField: "userId",
                 as: "senderUser"
             }
         },
@@ -145,13 +149,17 @@ async function getOutgoingFriendRequests(userId) {
                 _id: 0,
                 createdAt: 1,
                 recipient: {
-                    userId: "$recipientUser.id",
+                    userId: "$recipientUser.userId",
                     username: "$recipientUser.username",
+                    profilePictureUrl: "$recipientUser.profilePictureUrl",
+                    bio: "$recipientUser.bio",
                     createdAt: "$recipientUser.createdAt"
                 },
                 sender: {
-                    userId: "$senderUser.id",
+                    userId: "$senderUser.userId",
                     username: "$senderUser.username",
+                    profilePictureUrl: "$senderUser.profilePictureUrl",
+                    bio: "$senderUser.bio",
                     createdAt: "$senderUser.createdAt"
                 }
             }
