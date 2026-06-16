@@ -75,7 +75,8 @@ async function ws(ws, req) {
             currentChannel.sendToChannel(data.channelId, {
                 type: "typing",
                 channelId: data.channelId,
-                userId: ws.userId
+                userId: ws.userId,
+                username: req.auth.user.username
             })
         }
     })
