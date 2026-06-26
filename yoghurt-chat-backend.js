@@ -79,6 +79,16 @@ app.delete('/api/notifications/:id', require('./endpoints/notifications/notifica
 app.get('/api/admin/users', globalPermissionsMiddleware(["adminAccess", "viewUserInformation"]), require('./endpoints/admin/users').get)
 app.get('/api/admin/me', globalPermissionsMiddleware(["adminAccess"]), require('./endpoints/admin/me').get)
 
+app.post('/api/admin/users/:userId/suspend', globalPermissionsMiddleware(["adminAccess", "suspendUser"]), require('./endpoints/admin/suspend'))
+app.post('/api/admin/users/:userId/unsuspend', globalPermissionsMiddleware(["adminAccess", "suspendUser"]), require('./endpoints/admin/unsuspend'))
+app.post('/api/admin/users/:userId/protected-data', globalPermissionsMiddleware(["adminAccess"]), require('./endpoints/admin/protected-data').post)
+app.get('/api/admin/permissions', globalPermissionsMiddleware(["adminAccess", "managePermissions"]), require('./endpoints/admin/permissions').list)
+app.get('/api/admin/permissions/:userId', globalPermissionsMiddleware(["adminAccess", "managePermissions"]), require('./endpoints/admin/permissions').get)
+app.post('/api/admin/permissions/:userId', globalPermissionsMiddleware(["adminAccess", "managePermissions"]), require('./endpoints/admin/permissions').set)
+app.post('/api/admin/protocol-log', globalPermissionsMiddleware(["adminAccess"]), require('./endpoints/admin/protocol-log').post)
+app.get('/api/admin/protocols', globalPermissionsMiddleware(["adminAccess", "viewProtocols"]), require('./endpoints/admin/protocols').list)
+app.get('/api/admin/protocols/:userId', globalPermissionsMiddleware(["adminAccess", "viewProtocols"]), require('./endpoints/admin/protocols').byUser)
+
 app.listen(process.env.PORT, () => {
     console.log("App listening on port " + process.env.PORT);
 });
