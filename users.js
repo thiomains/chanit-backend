@@ -57,6 +57,20 @@ async function getUser(userId) {
     return user
 }
 
+async function getUserForAdmin(userId) {
+    const database = await db.connectDatabase();
+    const usersCollection = database.collection("users");
+
+    const user = await usersCollection.findOne({
+        id: userId
+    });
+    if (!user) {
+        return null;
+    }
+
+    return user
+}
+
 async function getUserByEmail(emailAddress) {
     const database = await db.connectDatabase();
     const usersCollection = database.collection("users");
@@ -191,4 +205,4 @@ async function deleteUser(userId) {
     await usersCollection.deleteOne({ id: userId });
 }
 
-module.exports = { getPublicUser, getUserByName, getUserByEmail, createAccount, getUserByFaser, getUser, setUserActive, setUserVerified, getAllUsers, updatePassword, updateEmail, deleteUser };
+module.exports = { getPublicUser, getUserByName, getUserByEmail, createAccount, getUserByFaser, getUser, getUserForAdmin, setUserActive, setUserVerified, getAllUsers, updatePassword, updateEmail, deleteUser };

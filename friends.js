@@ -253,4 +253,14 @@ async function removeAllFriendRequests(userId) {
     });
 }
 
-module.exports = { getMutualFriends, createFriendRequest, getIncomingFriendRequests, getOutgoingFriendRequests, getFriendships, addFriends, removeFriendRequest, getFriendship, getFriendRequest, getFriends, removeFriends, removeAllFriendRelations, removeAllFriendRequests };
+async function getFriendCount(userId) {
+    const friendships = await getFriendships(userId);
+    return friendships.length;
+}
+
+async function getFriendRequestStatus(userId) {
+    const [incoming, outgoing] = await Promise.all([getIncomingFriendRequests(userId), getOutgoingFriendRequests(userId)]);
+    return { incoming: incoming.length, outgoing: outgoing.length };
+}
+
+module.exports = { getMutualFriends, createFriendRequest, getIncomingFriendRequests, getOutgoingFriendRequests, getFriendships, addFriends, removeFriendRequest, getFriendship, getFriendRequest, getFriends, removeFriends, removeAllFriendRelations, removeAllFriendRequests, getFriendCount, getFriendRequestStatus };
