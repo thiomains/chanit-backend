@@ -3,6 +3,7 @@
     "test": "node --test test/*.test.js"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.5.0",
     "archiver": "^7.0.1",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.18.0",

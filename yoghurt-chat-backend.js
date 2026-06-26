@@ -89,6 +89,16 @@ app.post('/api/admin/protocol-log', globalPermissionsMiddleware(["adminAccess"])
 app.get('/api/admin/protocols', globalPermissionsMiddleware(["adminAccess", "viewProtocols"]), require('./endpoints/admin/protocols').list)
 app.get('/api/admin/protocols/:userId', globalPermissionsMiddleware(["adminAccess", "viewProtocols"]), require('./endpoints/admin/protocols').byUser)
 
-app.listen(process.env.PORT, () => {
-    console.log("App listening on port " + process.env.PORT);
-});
+const seed = require('./seed');
+
+async function start() {
+    if (process.env.DEV_MODE === "true") {
+        await seed.seedIfEmpty();
+    }
+
+    app.listen(process.env.PORT, () => {
+        console.log("App listening on port " + process.env.PORT);
+    });
+}
+
+start();
