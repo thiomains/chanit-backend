@@ -20,4 +20,21 @@ async function getPermissions(userId) {
     })
 }
 
-module.exports = { setPermission, getPermissions };
+async function setPermissions(userId, permissions) {
+    const database = await db.connectDatabase();
+    const permsCollection = database.collection("globalPermissions");
+
+    await permsCollection.updateOne(
+        { userId: userId },
+        { $set: permissions },
+        { upsert: true }
+    );
+}
+
+async function deletePermissions(userId) {
+    const database = await db.connectDatabase();
+    const permsCollection = database.collection("globalPermissions");
+    await permsCollection.deleteOne({ userId: userId });
+}
+
+module.exports = { setPermission, setPermissions, getPermissions, deletePermissions };

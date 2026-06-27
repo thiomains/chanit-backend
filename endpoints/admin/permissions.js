@@ -79,4 +79,93 @@ async function set(req, res) {
     res.send({ success: true });
 }
 
-module.exports = { list, get, set };
+async function add(req, res) {
+    const { username } = req.body;
+
+    if (!username || typeof username !== "string") {
+        res.status(400).send({ error: "username is required" });
+        return;
+    }
+
+    const user = await users.getUserForAdminByName(username);
+    if (!user) {
+        res.status(404).send({ error: "User not found" });
+        return;
+    }
+
+    await globalPermissions.setPermission(user.id, "adminAccess", true);
+
+    const database = await db.connectDatabase();
+    const profilesCol = database.collection("profiles");
+    const profile = await profilesCol.findOne({ userId: user.id });
+
+    await adminProtocols.logAction(
+        req.auth.user,
+        user.id,
+        user.username,
+        "addAdminAccess",
+        `Granted admin access to ${username}`,
+        req.ip,
+    );
+
+    res.status(201).send({
+        userId: user.id,
+        username: profile ? profile.username : user.username,
+        profilePictureUrl: profile ? profile.profilePictureUrl : null,
+        permissions: { adminAccess: true },
+    });
+}
+
+async function bulkSet(req, res) {
+    const { permissions } = req.body;
+
+    if (!permissions || typeof permissions !== "object") {
+        res.status(400).send({ error: "permissions object is required" });
+        return;
+    }
+
+    for (const key of Object.keys(permissions)) {
+        if (!VALID_PERMISSIONS.includes(key)) {
+            res.status(400).send({ error: "Unknown permission: " + key });
+            return;
+        }
+        if (typeof permissions[key] !== "boolean") {
+            res.status(400).send({ error: `value for ${key} must be boolean` });
+            return;
+        }
+    }
+
+    await globalPermissions.setPermissions(req.params.userId, permissions);
+
+    const target = await users.getUserForAdmin(req.params.userId);
+
+    await adminProtocols.logAction(
+        req.auth.user,
+        req.params.userId,
+        target ? target.username : req.params.userId,
+        "bulkSetPermissions",
+        "Set permissions: " + JSON.stringify(permissions),
+        req.ip,
+    );
+
+    res.send({ success: true });
+}
+
+async function remove(req, res) {
+    await globalPermissions.deletePermissions(req.params.userId);
+
+    const target = await users.getUserForAdmin(req.params.userId);
+
+    await adminProtocols.logAction(
+        req.auth.user,
+        req.params.userId,
+        target ? target.username : req.params.userId,
+        "removeAdminAccess",
+        "Removed admin access",
+        req.ip,
+    );
+
+    res.send({ success: true });
+}
+
+module.exports = { list, get, set, add, bulkSet, remove };

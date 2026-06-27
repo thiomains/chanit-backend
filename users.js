@@ -40,6 +40,21 @@ async function getUserByName(username) {
     return user
 }
 
+async function getUserForAdminByName(username) {
+    const database = await db.connectDatabase();
+    const usersCollection = database.collection("users");
+
+    const user = await usersCollection.findOne({
+        username: username
+    });
+    if (!user) {
+        return null;
+    }
+    // No active check — admin needs to manage all users
+
+    return user
+}
+
 async function getUser(userId) {
     const database = await db.connectDatabase();
     const usersCollection = database.collection("users");
@@ -205,4 +220,4 @@ async function deleteUser(userId) {
     await usersCollection.deleteOne({ id: userId });
 }
 
-module.exports = { getPublicUser, getUserByName, getUserByEmail, createAccount, getUserByFaser, getUser, getUserForAdmin, setUserActive, setUserVerified, getAllUsers, updatePassword, updateEmail, deleteUser };
+module.exports = { getPublicUser, getUserByName, getUserForAdminByName, getUserByEmail, createAccount, getUserByFaser, getUser, getUserForAdmin, setUserActive, setUserVerified, getAllUsers, updatePassword, updateEmail, deleteUser };

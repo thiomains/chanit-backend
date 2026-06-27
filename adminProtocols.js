@@ -19,11 +19,14 @@ async function logAction(adminUser, targetUserId, targetUsername, action, reason
     return doc;
 }
 
-async function getProtocols({ admin, action, target, page = 1, limit = 50 } = {}) {
+async function getProtocols({ admin, action, target, targetId, page = 1, limit = 50 } = {}) {
     const filter = {};
-    if (admin) filter.adminUserId = admin;
+    if (admin) filter.adminUsername = { $regex: admin, $options: 'i' };
     if (action) filter.action = action;
-    if (target) filter.targetUserId = target;
+    if (target) filter.targetUsername = { $regex: target, $options: 'i' };
+    if (targetId) filter.targetUserId = targetId;
+
+    console.log('[getProtocols] filter:', JSON.stringify(filter));
 
     const database = await db.connectDatabase();
     const col = database.collection('adminProtocols');
@@ -40,7 +43,7 @@ async function getProtocols({ admin, action, target, page = 1, limit = 50 } = {}
 }
 
 async function getProtocolsByUser(userId) {
-    return getProtocols({ target: userId });
+    return getProtocols({ targetId: userId });
 }
 
 module.exports = { logAction, getProtocols, getProtocolsByUser };
