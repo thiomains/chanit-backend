@@ -1,7 +1,8 @@
 const bcrypt = require('bcrypt');
-const { faker } = require('@faker-js/faker');
 const db = require('./database');
 const snowflake = require('./snowflake');
+
+let faker;
 
 const SEED_COUNT = 20;
 const FRIENDS_MIN = 3;
@@ -11,6 +12,11 @@ const MESSAGES_MAX = 30;
 const SEED_PASSWORD = 'Seed1234!';
 
 async function seedIfEmpty() {
+    if (!faker) {
+        const mod = await import('@faker-js/faker');
+        faker = mod.faker;
+    }
+
     const database = await db.connectDatabase();
     const usersCollection = database.collection("users");
 
